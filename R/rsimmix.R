@@ -22,7 +22,7 @@
 #'                  comp.param = list(f = list(mean = 3, sd = 0.5), g = list(mean = 0, sd = 1)))
 #' class(sim.X)
 #' attributes(sim.X)
-#' plot_admix(sim.X = sim.X$mixt.data, sim.Y = NULL, user.bounds = NULL, support = 'continuous')
+#' plot_mixt_density(samples = list(sim.X$mixt.data), user.bounds = NULL, support = 'continuous')
 #'
 #' @author Xavier Milhaud <xavier.milhaud.research@gmail.com>
 #' @export
@@ -87,9 +87,9 @@ rsimmix <- function(n = 1000, unknownComp_weight = 0.5,
 }
 
 
-#' Simulation of a two-component mixture with one component following a two-component mixture
+#' Simulation of a two-component gaussian mixture with one component following a two-component gaussian mixture
 #'
-#' simulate a two-component admixture model, where the first component is a mixture itself
+#' Simulate a two-component gaussian admixture model, where the first component is a gaussian mixture itself
 #'
 #' @param n is the number of observations to be drawn
 #' @param a the shift of the mean for the two distributions that are embedded in the unknown component

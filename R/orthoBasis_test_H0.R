@@ -5,8 +5,8 @@
 #' functions (pdf) l1 = p1*f1 + (1-p1)*g1 and l2 = p2*f2 + (1-p2)*g2, where g1 and g2 are the only known elements.
 #' The admixture weights p1 and p2 thus have to be estimated. For further information on this method, see 'Details' below.
 #'
-#' @param data.X First observed sample following mixture distribution given by l1.
-#' @param data.Y Second observed sample following mixture distribution given by l2.
+#' @param samples A list of the two observed samples, where each sample follows the mixture distribution given by l = p*f + (1-p)*g,
+#'                with f and p unknown and g known.
 #' @param known.p (default to NULL) Numeric vector with two elements, respectively the component weight for the unknown component
 #'                 in the first and in the second samples.
 #' @param comp.dist A list with four elements corresponding to the component distributions (specified with R native names for these distributions)
@@ -50,16 +50,16 @@
 #' list.param <- list(f1 = c(mean = 1, sd = 1), g1 = c(mean = 4, sd = 1),
 #'                    f2 = c(mean = 1, sd = 1), g2 = c(mean = 5, sd = 0.5))
 #' sim.X <- rsimmix(n = 250, unknownComp_weight=0.9, comp.dist = list(list.comp$f1,list.comp$g1),
-#'                  comp.param = list(list.param$f1, list.param$g1))
+#'                  comp.param = list(list.param$f1, list.param$g1))$mixt.data
 #' sim.Y <- rsimmix(n = 300, unknownComp_weight=0.8, comp.dist = list(list.comp$f2,list.comp$g2),
-#'                  comp.param = list(list.param$f2, list.param$g2))
-#' plot_admix(sim.X = sim.X[['mixt.data']], sim.Y = sim.Y[['mixt.data']], support = "continuous")
+#'                  comp.param = list(list.param$f2, list.param$g2))$mixt.data
+#' plot_mixt_density(samples = list(sim.X, sim.Y), support = "continuous")
 #' ## Perform the hypothesis test in real-life conditions:
 #' list.comp <- list(f1 = NULL, g1 = "norm",
 #'                   f2 = NULL, g2 = "norm")
 #' list.param <- list(f1 = NULL, g1 = c(mean = 4, sd = 1),
 #'                    f2 = NULL, g2 = c(mean = 5, sd = 0.5))
-#' test <- orthoBasis_test_H0(data.X = sim.X[['mixt.data']], data.Y = sim.Y[['mixt.data']],
+#' test <- orthoBasis_test_H0(samples = list(sim.X, sim.Y),
 #'              known.p=NULL, comp.dist = list.comp, comp.param = list.param, known.coef=NULL, K=3,
 #'              nb.ssEch = 2, s = 0.25, var.explicit=TRUE, nb.echBoot=NULL, support = 'Real',
 #'              bounds.supp = NULL, est.method = 'BVdk', uniformized.knownComp_data = NULL)
@@ -69,7 +69,7 @@
 #' @author Xavier Milhaud <xavier.milhaud.research@gmail.com>
 #' @export
 
-orthoBasis_test_H0 <- function(data.X, data.Y, known.p = NULL, comp.dist = NULL, comp.param = NULL, known.coef = NULL,
+orthoBasis_test_H0 <- function(samples, known.p = NULL, comp.dist = NULL, comp.param = NULL, known.coef = NULL,
                                 K = 3, nb.ssEch = 2, s = 0.49, var.explicit = FALSE, nb.echBoot = NULL,
                                 support = c("Real","Integer","Positive","Bounded.continuous","Bounded.discrete"), bounds.supp = NULL,
                                 est.method = c("BVdk","PS"), uniformized.knownComp_data = NULL)
@@ -104,15 +104,15 @@ orthoBasis_test_H0 <- function(data.X, data.Y, known.p = NULL, comp.dist = NULL,
 
   ##---- Splitting the original data for future uncorrelated estimations ----##
   ## Perform this step twice: once for the estimation of component weights, and the other for polynomial coefficients.
-  n1 <- length(data.X)
-  n2 <- length(data.Y)
+  n1 <- length(samples[[1]])
+  n2 <- length(samples[[2]])
   indices1 <- sample.int(n = n1, size = floor(n1 / nb.ssEch), replace = FALSE, prob = NULL)
-  data.coef1 <- data.X[indices1]
-  data.p1 <- data.X[-indices1]
+  data.coef1 <- samples[[1]][indices1]
+  data.p1 <- samples[[1]][-indices1]
   n.p1 <- length(data.p1)
   indices2 <- sample.int(n = n2, size = floor(n2 / nb.ssEch), replace = FALSE, prob = NULL)
-  data.coef2 <- data.Y[indices2]
-  data.p2 <- data.Y[-indices2]
+  data.coef2 <- samples[[2]][indices2]
+  data.p2 <- samples[[2]][-indices2]
   n.p2 <- length(data.p2)
 
   ##---- Estimate the expansion coefficients of the admixture sample in the orthonormal polynomial basis ----##
@@ -243,10 +243,10 @@ orthoBasis_test_H0 <- function(data.X, data.Y, known.p = NULL, comp.dist = NULL,
   pvalu <- 1 - stats::pchisq(stat.test.final, 1)
 
   ## Save memory :
-  rm(data.X) ; rm(data.Y) ; rm(data.coef1) ; rm(data.coef2) ; rm(data.p1) ; rm(data.p2)
+  rm(data.coef1) ; rm(data.coef2) ; rm(data.p1) ; rm(data.p2)
   rm(moy.coef1) ; rm(moy.coef2) ; rm(var.coef1) ; rm(var.coef2)
 
-  list(decision = rej, p_value = pvalu, test_statistic = stat.test.final, varCov.matrix = var.T,
+  list(rejection_rule = rej, p_value = pvalu, test.stat = stat.test.final, varCov.matrix = var.T,
        rank = indice.opt, p1 = hat.p1, p2 = hat.p2)
 }
 

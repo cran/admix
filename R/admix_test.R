@@ -31,6 +31,7 @@
 #'                   list(f1 = NULL, g1 = list(mean=0,sd=1), f2 = NULL, g2 = list(mean=3,sd=1.1), f3 = NULL, g3 = list(mean=-2,sd=0.6)).
 #' @param support (Potentially used with 'Poly' testing method, otherwise useless) The support of the observations; one of "Real",
 #'                 "Integer", "Positive", or "Bounded.continuous".
+#' @param conf.level The confidence level of the K-sample test.
 #' @param parallel (default to FALSE) Boolean indicating whether parallel computations are performed (speed-up the tabulation).
 #' @param n_cpu (default to 2) Number of cores used when parallelizing.
 #'
@@ -39,7 +40,9 @@
 #'          Gaussianity test' (EJS, Pommeret & Vanderkerkhove, 2017), or 'Semiparametric two-sample admixture components comparison test:
 #'          the symmetric case' (JSPI, Milhaud & al., 2021).
 #'
-#' @return A list containing...
+#' @return A list containing the decision of the test (reject or not), the confidence level at which the test is performed,
+#'         the p-value of the test, and the value of the test statistic (following a chi2 distribution with one degree of freedom
+#'         under the null).
 #'
 #' @examples
 #' ##### On a simulated example, with 1 sample (gaussianity test):
@@ -51,16 +54,17 @@
 #' ## Perform the test hypothesis:
 #' list.comp <- list(f1 = NULL, g1 = "norm")
 #' list.param <- list(f1 = NULL, g1 = list(mean = 2, sd = 0.7))
-#' admix_test(samples = list(sim1), sym.f = TRUE, test.method = 'Poly', sim_U = NULL, n_sim_tab=50,
-#'            min_size = NULL, comp.dist = list.comp, comp.param = list.param, support = "Real",
-#'            parallel = FALSE, n_cpu = 2)
+#' gaussTest <- admix_test(samples = list(sim1), sym.f = TRUE, test.method = 'Poly', sim_U = NULL,
+#'                         n_sim_tab = 50, min_size = NULL, comp.dist = list.comp,
+#'                         comp.param = list.param, support = "Real", conf.level = 0.95,
+#'                         parallel = FALSE, n_cpu = 2)
 #'
 #' @author Xavier Milhaud <xavier.milhaud.research@gmail.com>
 #' @export
 
 admix_test <- function(samples = NULL, sym.f = FALSE, test.method = c("Poly","ICV"), sim_U = NULL, n_sim_tab = 50,
                        min_size = NULL, comp.dist = NULL, comp.param = NULL, support = c("Real","Integer","Positive","Bounded.continuous"),
-                       parallel = FALSE, n_cpu = 4)
+                       conf.level = 0.95, parallel = FALSE, n_cpu = 2)
 {
   stopifnot( length(comp.dist) == (2*length(samples)) )
   if ( any(sapply(comp.dist, is.null)) | any(sapply(comp.param, is.null)) ) {
@@ -75,19 +79,20 @@ admix_test <- function(samples = NULL, sym.f = FALSE, test.method = c("Poly","IC
   supp <- match.arg(support)
   ## Check right specification of arguments:
   if ((n_samples == 1) & (meth == "ICV")) stop("Testing through the inner convergence property obtained using IBM approach requires at least two samples.")
-  if ((sym.f == FALSE) & (meth == "Poly")) stop("Testing using polynomial basis expansions requires a square-root n consistent estimation, and thus a symmetric unknown component.")
+  if ((sym.f == FALSE) & (meth == "Poly")) stop("Testing using polynomial basis expansions requires a square-root n consistent estimation
+                                                of the unknown components weights, and thus symmetric unknown components.")
 
   if (meth == "ICV") {
 
     if (n_samples == 2) {
       U <- IBM_tabul_stochasticInteg(n.sim = n_sim_tab, n.varCovMat = 100, sample1 = samples[[1]], sample2 = samples[[2]], min_size = NULL,
                                      comp.dist = comp.dist, comp.param = comp.param, parallel = parallel, n_cpu = n_cpu)
-      test_res <- IBM_test_H0(sample1 = samples[[1]], sample2 = samples[[2]], known.p = NULL, comp.dist = comp.dist,
-                              comp.param = comp.param, sim_U = U[["U_sim"]], min_size=NULL, parallel=parallel, n_cpu=n_cpu)
+      test_res <- IBM_test_H0(samples = samples, known.p = NULL, comp.dist = comp.dist, comp.param = comp.param, sim_U = U[["U_sim"]],
+                              min_size=NULL, conf.level = conf.level, parallel = parallel, n_cpu = n_cpu)
     } else if (n_samples > 2) {
       test_res <- IBM_k_samples_test(samples = samples, sim_U = NULL, n_sim_tab = n_sim_tab,
                                      min_size = NULL, comp.dist = comp.dist, comp.param = comp.param,
-                                     parallel = parallel, n_cpu = n_cpu)
+                                     conf.level = conf.level, parallel = parallel, n_cpu = n_cpu)
     } else stop("Incorrect number of samples under study!")
 
   } else if (meth == "Poly") {
@@ -108,7 +113,7 @@ admix_test <- function(samples = NULL, sym.f = FALSE, test.method = c("Poly","IC
         couples.param[[k]] <- comp.param[c(model.list[[couples.list[k, ][1]]], model.list[[couples.list[k, ][2]]])]
         names(couples.expr[[k]]) <- names(couples.param[[k]]) <- c("f1","g1","f2","g2")
         ## Hypothesis test :
-        test_res[[k]] <- orthoBasis_test_H0(data.X = samples[[couples.list[k, ][1]]], data.Y = samples[[couples.list[k, ][2]]],
+        test_res[[k]] <- orthoBasis_test_H0(samples = list(samples[[couples.list[k, ][1]]], samples[[couples.list[k, ][2]]]),
                                             known.p = NULL, comp.dist = couples.expr[[k]], comp.param = couples.param[[k]],
                                             known.coef = NULL, K = 3, nb.ssEch = 2, s = 0.49, var.explicit = TRUE,
                                             nb.echBoot = NULL, support = supp, bounds.supp = NULL, est.method = "BVdk")
@@ -117,6 +122,12 @@ admix_test <- function(samples = NULL, sym.f = FALSE, test.method = c("Poly","IC
 
   } else stop("Please choose appropriately the arguments of the function.")
 
-  return(test_res)
-}
+  obj_res <- list(Reject_decision = test_res$rejection_rule,
+                  Confidence_level = conf.level,
+                  P_value = test_res$p_value,
+                  Statistic_value = test_res$test.stat)
+  class(obj_res) <- "admix_test"
+  obj_res$call <- match.call()
 
+  return(obj_res)
+}
