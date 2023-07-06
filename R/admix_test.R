@@ -36,7 +36,7 @@
 #' @param n_cpu (default to 2) Number of cores used when parallelizing.
 #'
 #' @details For further details on hypothesis techniques, see i) Inner convergence through IBM approach at
-#'          https://hal.archives-ouvertes.fr/hal-03201760 ; ii) Polynomial expansions at 'False Discovery Rate model
+#'          https://hal.science/hal-03201760 ; ii) Polynomial expansions at 'False Discovery Rate model
 #'          Gaussianity test' (EJS, Pommeret & Vanderkerkhove, 2017), or 'Semiparametric two-sample admixture components comparison test:
 #'          the symmetric case' (JSPI, Milhaud & al., 2021).
 #'
@@ -87,12 +87,12 @@ admix_test <- function(samples = NULL, sym.f = FALSE, test.method = c("Poly","IC
     if (n_samples == 2) {
       U <- IBM_tabul_stochasticInteg(n.sim = n_sim_tab, n.varCovMat = 100, sample1 = samples[[1]], sample2 = samples[[2]], min_size = NULL,
                                      comp.dist = comp.dist, comp.param = comp.param, parallel = parallel, n_cpu = n_cpu)
-      test_res <- IBM_test_H0(samples = samples, known.p = NULL, comp.dist = comp.dist, comp.param = comp.param, sim_U = U[["U_sim"]],
-                              min_size=NULL, conf.level = conf.level, parallel = parallel, n_cpu = n_cpu)
+      test_res <- IBM_2samples_test(samples = samples, known.p = NULL, comp.dist = comp.dist, comp.param = comp.param, sim_U = U[["U_sim"]],
+                                    min_size=NULL, conf.level = conf.level, parallel = parallel, n_cpu = n_cpu)
     } else if (n_samples > 2) {
-      test_res <- IBM_k_samples_test(samples = samples, sim_U = NULL, n_sim_tab = n_sim_tab,
-                                     min_size = NULL, comp.dist = comp.dist, comp.param = comp.param,
-                                     conf.level = conf.level, parallel = parallel, n_cpu = n_cpu)
+      test_res <- IBM_k_samples_test(samples = samples, sim_U = NULL, n_sim_tab = n_sim_tab, min_size = NULL,
+                                     comp.dist = comp.dist, comp.param = comp.param, conf.level = conf.level,
+                                     tune.penalty = TRUE, parallel = parallel, n_cpu = n_cpu)
     } else stop("Incorrect number of samples under study!")
 
   } else if (meth == "Poly") {

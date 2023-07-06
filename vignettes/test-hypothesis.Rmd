@@ -125,7 +125,7 @@ Estimation of the unknown quantities is made by the Inversion - Best Matching ap
 
 # The K-sample case
 
-We introduce hereafter a natural extension of the two-sample case to the K-sample one. In what follows, the K-sample test is illustrated within the framework of the IBM approach, i.e. using the associated inner convergence property. Of course, in the case when all the unknown component densities are assumed to be symmetric, one could use a pairwise version of the two sample test using the comparison of expansion coefficients in a polynomial orthonormal basis, associated to the estimation method provided by [@BV10].
+We introduce hereafter a natural extension of the two-sample case to the K-sample one, see [@MilhaudCluster23]. In what follows, the K-sample test is illustrated within the framework of the IBM approach, i.e. using the associated inner convergence property. Of course, in the case when all the unknown component densities are assumed to be symmetric, one could use a pairwise version of the two sample test using the comparison of expansion coefficients in a polynomial orthonormal basis, associated to the estimation method provided by [@BV10].
 
 Consider $K$ samples. For $i=1,...,K$, sample $X^{(i)} = (X_1^{(i)}, ..., X_{n_i}^{(i)})$ follows
 $$L_i(x) = p_i F_i(x) + (1-p_i) G_i, \qquad x \in \mathbb{R}.$$
@@ -185,7 +185,8 @@ list.param <- list(f1 = NULL, g1 = list(mean = 2, sd = 0.7),
                    f2 = NULL, g2 = list(mean = 4, sd = 1.1),
                    f3 = NULL, g3 = list(mean = 3, sd = 0.8))
 obj <- IBM_k_samples_test(samples = list(sim1,sim2,sim3), sim_U = NULL, n_sim_tab = 8, min_size = NULL,
-                          comp.dist = list.comp, comp.param = list.param, parallel = FALSE, n_cpu = 2)
+                          comp.dist = list.comp, comp.param = list.param, tune.penalty = TRUE,
+                          parallel = FALSE, n_cpu = 2)
 obj$rejection_rule
 ```
 

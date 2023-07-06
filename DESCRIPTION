@@ -1,7 +1,7 @@
 Package: admix
 Title: Package Admix for Admixture (aka Contamination) Models
-Version: 2.1-0
-Date: 2023-03-22
+Version: 2.1-1
+Date: 2023-07-5
 Authors@R: c(
     person(given = "Xavier",
            family = "Milhaud",
@@ -45,11 +45,11 @@ Config/testthat/edition: 3
 VignetteBuilder: knitr
 Language: en-US
 NeedsCompilation: yes
-Packaged: 2023-03-23 11:30:17 UTC; XM
+Packaged: 2023-07-06 13:28:29 UTC; XM
 Author: Xavier Milhaud [aut, cre],
   Pierre Vandekerkhove [ctb],
   Denys Pommeret [ctb],
   Yahia Salhi [ctb]
 Maintainer: Xavier Milhaud <xavier.milhaud.research@gmail.com>
 Repository: CRAN
-Date/Publication: 2023-03-23 12:02:05 UTC
+Date/Publication: 2023-07-06 14:10:02 UTC
