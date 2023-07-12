@@ -1,7 +1,7 @@
 Package: admix
 Title: Package Admix for Admixture (aka Contamination) Models
-Version: 2.1-1
-Date: 2023-07-5
+Version: 2.1-2
+Date: 2023-07-11
 Authors@R: c(
     person(given = "Xavier",
            family = "Milhaud",
@@ -34,8 +34,8 @@ BugReports: https://github.com/XavierMilhaud/admix/issues
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.2.3
-Imports: base, fdrtool, graphics, Iso, MASS, methods, orthopolynom,
-        pracma, Rcpp, stats, utils
+Imports: base, cubature, fdrtool, graphics, Iso, MASS, methods,
+        orthopolynom, pracma, Rcpp, stats, utils
 Suggests: rmutil, doParallel, foreach, evd, logitnorm, flexsurv, plyr,
         reshape2, gridExtra, lattice, testthat (>= 3.0.0), knitr,
         rmarkdown, markdown, spelling
@@ -45,11 +45,11 @@ Config/testthat/edition: 3
 VignetteBuilder: knitr
 Language: en-US
 NeedsCompilation: yes
-Packaged: 2023-07-06 13:28:29 UTC; XM
+Packaged: 2023-07-11 12:53:51 UTC; XM
 Author: Xavier Milhaud [aut, cre],
   Pierre Vandekerkhove [ctb],
   Denys Pommeret [ctb],
   Yahia Salhi [ctb]
 Maintainer: Xavier Milhaud <xavier.milhaud.research@gmail.com>
 Repository: CRAN
-Date/Publication: 2023-07-06 14:10:02 UTC
+Date/Publication: 2023-07-12 22:50:15 UTC

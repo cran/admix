@@ -450,7 +450,7 @@ Gamma-Gamma mixtures.</p>
 <span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>  <span class="sc">|</span>                                                        </span>
 <span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>  <span class="er">|</span>                                                  <span class="er">|</span>   <span class="dv">0</span>%</span>
 <span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>  <span class="sc">|</span>                                                        </span>
-<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>  <span class="er">|==</span>                                                <span class="er">|</span>   <span class="dv">4</span>%</span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>  <span class="er">|====</span>                                              <span class="er">|</span>   <span class="dv">8</span>%</span>
 <span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>  <span class="sc">|</span>                                                        </span>
 <span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>  <span class="er">|==============================</span>                    <span class="er">|</span>  <span class="dv">60</span>%</span>
 <span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a>  <span class="sc">|</span>                                                        </span>
@@ -466,31 +466,27 @@ Gamma-Gamma mixtures.</p>
 <span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; The number of populations/samples under study is 5.</span></span>
 <span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; The level of the underlying k-sample testing procedure is set to 5%.</span></span>
 <span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; The number of detected clusters in these populations equals 5.</span></span>
-<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; The p-values of the k-sample tests (showing when to close the clusters (i.e. p-value &lt; 0.05) equal: 0, 0, 0.</span></span>
+<span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; The number of detected clusters in these populations equals 3.</span></span>
+<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; The p-values of the k-sample tests (showing when to close the clusters (i.e. p-value &lt; 0.05) equal: 0.333, 0, 0, 0.111.</span></span>
 <span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
 <span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; The list of clusters with populations belonging to them (in numeric format, i.e. inside c()) :</span></span>
-<span id="cb4-59"><a href="#cb4-59" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    - Cluster #1: vector of populations 1</span></span>
-<span id="cb4-60"><a href="#cb4-60" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   - Cluster #2: vector of populations 3</span></span>
-<span id="cb4-61"><a href="#cb4-61" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   - Cluster #3: vector of populations 5</span></span>
-<span id="cb4-62"><a href="#cb4-62" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   - Cluster #4: vector of populations 2</span></span>
-<span id="cb4-63"><a href="#cb4-63" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   - Cluster #5: vector of populations 4</span></span>
-<span id="cb4-64"><a href="#cb4-64" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb4-65"><a href="#cb4-65" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; The list of estimated weights for the unknown component distributions in each detected cluster</span></span>
-<span id="cb4-66"><a href="#cb4-66" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       (in the same format and order as listed populations for clusters just above) :</span></span>
-<span id="cb4-67"><a href="#cb4-67" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    - estimated weights of the unknown component distributions for cluster  1 :  numeric(0)</span></span>
-<span id="cb4-68"><a href="#cb4-68" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   - estimated weights of the unknown component distributions for cluster  2 :  numeric(0)</span></span>
-<span id="cb4-69"><a href="#cb4-69" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   - estimated weights of the unknown component distributions for cluster  3 :  numeric(0)</span></span>
-<span id="cb4-70"><a href="#cb4-70" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   - estimated weights of the unknown component distributions for cluster  4 :  numeric(0)</span></span>
-<span id="cb4-71"><a href="#cb4-71" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   - estimated weights of the unknown component distributions for cluster  5 :  numeric(0)</span></span>
-<span id="cb4-72"><a href="#cb4-72" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb4-73"><a href="#cb4-73" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; The matrix giving the distances between populations, used in the clustering procedure through the k-sample tests:</span></span>
-<span id="cb4-74"><a href="#cb4-74" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;            [,1]       [,2]       [,3]      [,4]       [,5]</span></span>
-<span id="cb4-75"><a href="#cb4-75" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,]  0.0000000 31.8864244  0.1778152  5.536912 53.9937003</span></span>
-<span id="cb4-76"><a href="#cb4-76" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [2,] 31.8864244  0.0000000 22.1883683  3.855006  0.2510432</span></span>
-<span id="cb4-77"><a href="#cb4-77" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [3,]  0.1778152 22.1883683  0.0000000 56.796301 18.6100060</span></span>
-<span id="cb4-78"><a href="#cb4-78" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [4,]  5.5369124  3.8550064 56.7963007  0.000000  2.6597505</span></span>
-<span id="cb4-79"><a href="#cb4-79" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [5,] 53.9937003  0.2510432 18.6100060  2.659750  0.0000000</span></span></code></pre></div>
+<span id="cb4-59"><a href="#cb4-59" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    - Cluster #1: vector of populations c(1, 3)</span></span>
+<span id="cb4-60"><a href="#cb4-60" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   - Cluster #2: vector of populations 4</span></span>
+<span id="cb4-61"><a href="#cb4-61" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   - Cluster #3: vector of populations c(2, 5)</span></span>
+<span id="cb4-62"><a href="#cb4-62" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb4-63"><a href="#cb4-63" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; The list of estimated weights for the unknown component distributions in each detected cluster</span></span>
+<span id="cb4-64"><a href="#cb4-64" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       (in the same format and order as listed populations for clusters just above) :</span></span>
+<span id="cb4-65"><a href="#cb4-65" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    - estimated weights of the unknown component distributions for cluster  1 :  c(0.809178290213258, 0.631001196480248)</span></span>
+<span id="cb4-66"><a href="#cb4-66" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   - estimated weights of the unknown component distributions for cluster  2 :  numeric(0)</span></span>
+<span id="cb4-67"><a href="#cb4-67" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   - estimated weights of the unknown component distributions for cluster  3 :  c(0.523639573546502, 0.58440106951725)</span></span>
+<span id="cb4-68"><a href="#cb4-68" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb4-69"><a href="#cb4-69" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; The matrix giving the distances between populations, used in the clustering procedure through the k-sample tests:</span></span>
+<span id="cb4-70"><a href="#cb4-70" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;             [,1]       [,2]        [,3]      [,4]       [,5]</span></span>
+<span id="cb4-71"><a href="#cb4-71" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,]  0.00000000 29.9669866  0.02926702  7.540128 45.3573537</span></span>
+<span id="cb4-72"><a href="#cb4-72" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [2,] 29.96698661  0.0000000 19.15790613  4.827311  0.1379936</span></span>
+<span id="cb4-73"><a href="#cb4-73" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [3,]  0.02926702 19.1579061  0.00000000 69.499273 20.9549883</span></span>
+<span id="cb4-74"><a href="#cb4-74" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [4,]  7.54012842  4.8273114 69.49927347  0.000000  3.1603965</span></span>
+<span id="cb4-75"><a href="#cb4-75" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [5,] 45.35735370  0.1379936 20.95498826  3.160397  0.0000000</span></span></code></pre></div>
 <div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-MilhaudCluster23" class="csl-entry">
 Milhaud, Pommeret, X., and P. Vandekerkhove. 2023.
