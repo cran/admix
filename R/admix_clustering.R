@@ -17,17 +17,22 @@
 #'                   list(f1 = NULL, g1 = list(mean=0,sd=1), f2 = NULL, g2 = list(mean=3,sd=1.1), f3 = NULL, g3 = list(mean=-2,sd=0.6)).
 #' @param tabul.dist Only useful for comparisons of detected clusters at different confidence levels. Is a list of the tabulated distributions
 #'                   of the stochastic integral for each cluster previously detected.
+#' @param tune.penalty A boolean that allows to choose between a classical penalty term or an optimized penalty embedding some tuning parameters
+#'                     (automatically optimized) for k-sample tests used within the clustering procedure.
+#'                     Optimized penalty is particularly useful for low sample size.
 #' @param conf.level The confidence level of the K-sample test used in the clustering procedure.
 #' @param parallel (default to FALSE) Boolean to indicate whether parallel computations are performed (speed-up the tabulation).
 #' @param n_cpu (default to 2) Number of cores used when parallelizing.
+#' @param echo (default to TRUE) Display the remaining computation time.
 #'
 #' @details See the paper at the following HAL weblink: https://hal.science/hal-04129130
 #'
-#' @return A list with eight elements: 1) the number of populations under consideration; 2) the number of detected clusters;
+#' @return A list with eleven elements: 1) the number of populations studied; 2) the number of detected clusters;
 #'         3) the list of p-values for each test performed; 4) the cluster affiliation for each population; 5) the chosen confidence
-#'         level of statistical tests; 6) the cluster components; 7) the estimated weights of the unknown component distributions inside
-#'         each cluster (remind that estimated weights are consistent only under the null); 8) the matrix of pairwise discrepancies
-#'         among all populations.
+#'         level of statistical tests; 6) the cluster components; 7) the size of clusters; 8) the estimated weights of the unknown
+#'         component distributions inside each cluster (remind that estimated weights are consistent only if unknown components are tested
+#'         to be identical); 9) the matrix of pairwise discrepancies across populations; 10) the tabulated distributions used for
+#'         statistical tests; 11) the initial call.
 #'
 #' @examples
 #' \donttest{
@@ -57,9 +62,10 @@
 #'                    f2 = NULL, g2 = list(rate = 1/5),
 #'                    f3 = NULL, g3 = list(shape = 12, rate = 2),
 #'                    f4 = NULL, g4 = list(rate = 1/7))
-#' clusters <- admix_clustering(samples = list(A.sim,B.sim,C.sim,D.sim), n_sim_tab = 8,
-#'                              comp.dist=list.comp, comp.param=list.param, conf.level = 0.95,
-#'                              parallel = FALSE, n_cpu = 2)
+#' clusters <- admix_clustering(samples = list(A.sim,B.sim,C.sim,D.sim), n_sim_tab = 30,
+#'                              comp.dist = list.comp, comp.param = list.param,
+#'                              tabul.dist = NULL, tune.penalty = TRUE, conf.level = 0.95,
+#'                              parallel = TRUE, n_cpu = 2, echo = FALSE)
 #' clusters
 #' }
 #'
@@ -67,7 +73,8 @@
 #' @export
 
 admix_clustering <- function(samples = NULL, n_sim_tab = 100, comp.dist = NULL, comp.param = NULL,
-                             tabul.dist = NULL, conf.level = 0.95, parallel = FALSE, n_cpu = 2)
+                             tabul.dist = NULL, tune.penalty = FALSE, conf.level = 0.95,
+                             parallel = FALSE, n_cpu = 2, echo = TRUE)
 {
   ## Control whether parallel computations were asked for or not:
   if (parallel) {
@@ -178,8 +185,10 @@ admix_clustering <- function(samples = NULL, n_sim_tab = 100, comp.dist = NULL, 
     #CDF_U <- stats::ecdf(U[["U_sim"]])
     p_value <- c(p_value, 1 - CDF_U(contrast.matrix[which_row, which_col]))
     CDF_U <- NULL
-    prog_bar <- utils::txtProgressBar(min = 0, max = length(samples), style = 3, width = 50, char = "=")
-    utils::setTxtProgressBar(prog_bar, 2/length(samples))
+    if (echo) {
+      prog_bar <- utils::txtProgressBar(min = 0, max = length(samples), style = 3, width = 50, char = "=")
+      utils::setTxtProgressBar(prog_bar, 2/length(samples))
+    }
   } else {
     clusters[[1]] <- as.character(which_row)
     clusters[[2]] <- as.character(which_col)
@@ -189,9 +198,11 @@ admix_clustering <- function(samples = NULL, n_sim_tab = 100, comp.dist = NULL, 
     new.n_clust <- 2
     ## Look for a second member to integrate the newly second built cluster:
     indexesSamples_to_consider <- c(0,0)
-    prog_bar <- utils::txtProgressBar(min = 0, max = length(samples), style = 3,  width = 50, char = "=")
-    utils::setTxtProgressBar(prog_bar, 1/length(samples))
+    if (echo) {
+      prog_bar <- utils::txtProgressBar(min = 0, max = length(samples), style = 3,  width = 50, char = "=")
+      utils::setTxtProgressBar(prog_bar, 1/length(samples))
     }
+  }
 
   while (length(alreadyGrouped_samples) < length(samples)) {
     ## Detect which are the neighboors of the current population under study:
@@ -254,13 +265,9 @@ admix_clustering <- function(samples = NULL, n_sim_tab = 100, comp.dist = NULL, 
           } else {
             ## K-sample test :
             comp_indices <- sort( c(2*indexesSamples_to_consider_new-1, 2*indexesSamples_to_consider_new) )
-            #k_sample_test <- IBM_k_samples_test(samples = samples[indexesSamples_to_consider_new], sim_U = U[["U_sim"]],
-            #                                    n_sim_tab = n_sim_tab, min_size = minimal_size, comp.dist = comp.dist[comp_indices],
-            #                                    comp.param = comp.param[comp_indices], conf.level = conf.level,
-            #                                    tune.penalty = TRUE, parallel = parallel, n_cpu = n_cpu)
             k_sample_test <- IBM_k_samples_test(samples = samples[indexesSamples_to_consider_new], sim_U = Usim, n_sim_tab = n_sim_tab,
                                                 comp.dist = comp.dist[comp_indices], comp.param = comp.param[comp_indices],
-                                                conf.level = conf.level, tune.penalty = TRUE, parallel = parallel, n_cpu = n_cpu)
+                                                conf.level = conf.level, tune.penalty = tune.penalty, parallel = parallel, n_cpu = n_cpu)
             tab_distrib <- append(tab_distrib, list(k_sample_test[["sim_U"]]))
             k_sample_decision <- k_sample_test$rejection_rule
             k_sample_pval <- k_sample_test$p_value
@@ -286,9 +293,9 @@ admix_clustering <- function(samples = NULL, n_sim_tab = 100, comp.dist = NULL, 
       }
     }
     indexesSamples_to_consider <- indexesSamples_to_consider_new
-    utils::setTxtProgressBar(prog_bar, length(alreadyGrouped_samples))
+    if (echo) utils::setTxtProgressBar(prog_bar, length(alreadyGrouped_samples))
   } # End of While
-  base::close(prog_bar)
+  if (echo) base::close(prog_bar)
 
   ## Define function that copies upper triangle to lower triangle to make the matrix become symmetric:
   f <- function(mat) {
