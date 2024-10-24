@@ -368,9 +368,11 @@ admixture models</h1>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(admix)</span></code></pre></div>
 <p>The clustering of populations following admixture models is, for now,
 based on the K-sample test theory (see <span class="citation">(Milhaud
-and Vandekerkhove 2023)</span>. Consider <span class="math inline">\(K\)</span> samples. For <span class="math inline">\(i=1,...,K\)</span>, sample <span class="math inline">\(X^{(i)} = (X_1^{(i)}, ..., X_{n_i}^{(i)})\)</span>
-follows <span class="math display">\[L_i(x) = p_i F_i(x) + (1-p_i) G_i,
-\qquad x \in \mathbb{R}.\]</span></p>
+et al. 2024)</span>. Consider <span class="math inline">\(K\)</span>
+samples. For <span class="math inline">\(i=1,...,K\)</span>, sample
+<span class="math inline">\(X^{(i)} = (X_1^{(i)}, ...,
+X_{n_i}^{(i)})\)</span> follows <span class="math display">\[L_i(x) =
+p_i F_i(x) + (1-p_i) G_i, \qquad x \in \mathbb{R}.\]</span></p>
 <p>We still use IBM approach to perform pairwise hypothesis testing. The
 idea is to adapt the K-sample test procedure to obtain a data-driven
 method that cluster the <span class="math inline">\(K\)</span>
@@ -410,77 +412,67 @@ Test $H_0$ the simultaneous equality of all the $f_j$, $j\in S_c$ :\\
 <h1>Applications</h1>
 <div id="on-mathbbr" class="section level2">
 <h2>On <span class="math inline">\(\mathbb{R}^+\)</span></h2>
-<p>We present a case study with 5 populations to cluster on <span class="math inline">\(\mathbb{R}^+\)</span>, with Gamma-Exponential and
-Gamma-Gamma mixtures.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="do">## Simulate data (chosen parameters indicate 3 clusters (populations (1,3), (2,5) and 4)!):</span></span>
-<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>list.comp <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">f1 =</span> <span class="st">&quot;gamma&quot;</span>, <span class="at">g1 =</span> <span class="st">&quot;exp&quot;</span>,</span>
-<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>                  <span class="at">f2 =</span> <span class="st">&quot;gamma&quot;</span>, <span class="at">g2 =</span> <span class="st">&quot;exp&quot;</span>,</span>
-<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>                  <span class="at">f3 =</span> <span class="st">&quot;gamma&quot;</span>, <span class="at">g3 =</span> <span class="st">&quot;gamma&quot;</span>,</span>
-<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>                  <span class="at">f4 =</span> <span class="st">&quot;exp&quot;</span>, <span class="at">g4 =</span> <span class="st">&quot;exp&quot;</span>,</span>
-<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>                  <span class="at">f5 =</span> <span class="st">&quot;gamma&quot;</span>, <span class="at">g5 =</span> <span class="st">&quot;exp&quot;</span>)</span>
-<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>list.param <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">f1 =</span> <span class="fu">list</span>(<span class="at">shape =</span> <span class="dv">16</span>, <span class="at">rate =</span> <span class="dv">4</span>), <span class="at">g1 =</span> <span class="fu">list</span>(<span class="at">rate =</span> <span class="dv">1</span><span class="sc">/</span><span class="fl">3.5</span>),</span>
-<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>                   <span class="at">f2 =</span> <span class="fu">list</span>(<span class="at">shape =</span> <span class="dv">14</span>, <span class="at">rate =</span> <span class="dv">2</span>), <span class="at">g2 =</span> <span class="fu">list</span>(<span class="at">rate =</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">5</span>),</span>
-<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a>                   <span class="at">f3 =</span> <span class="fu">list</span>(<span class="at">shape =</span> <span class="dv">16</span>, <span class="at">rate =</span> <span class="dv">4</span>), <span class="at">g3 =</span> <span class="fu">list</span>(<span class="at">shape =</span> <span class="dv">12</span>, <span class="at">rate =</span> <span class="dv">2</span>),</span>
-<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a>                   <span class="at">f4 =</span> <span class="fu">list</span>(<span class="at">rate =</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">2</span>), <span class="at">g4 =</span> <span class="fu">list</span>(<span class="at">rate =</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">7</span>),</span>
-<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a>                   <span class="at">f5 =</span> <span class="fu">list</span>(<span class="at">shape =</span> <span class="dv">14</span>, <span class="at">rate =</span> <span class="dv">2</span>), <span class="at">g5 =</span> <span class="fu">list</span>(<span class="at">rate =</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">6</span>))</span>
-<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a>A.sim <span class="ot">&lt;-</span> <span class="fu">rsimmix</span>(<span class="at">n=</span><span class="dv">6000</span>, <span class="at">unknownComp_weight=</span><span class="fl">0.8</span>, <span class="at">comp.dist =</span> <span class="fu">list</span>(list.comp<span class="sc">$</span>f1,list.comp<span class="sc">$</span>g1),</span>
-<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a>                 <span class="at">comp.param =</span> <span class="fu">list</span>(list.param<span class="sc">$</span>f1, list.param<span class="sc">$</span>g1))<span class="sc">$</span>mixt.data</span>
-<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a>B.sim <span class="ot">&lt;-</span> <span class="fu">rsimmix</span>(<span class="at">n=</span><span class="dv">6000</span>, <span class="at">unknownComp_weight=</span><span class="fl">0.5</span>, <span class="at">comp.dist =</span> <span class="fu">list</span>(list.comp<span class="sc">$</span>f2,list.comp<span class="sc">$</span>g2),</span>
-<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a>                 <span class="at">comp.param =</span> <span class="fu">list</span>(list.param<span class="sc">$</span>f2, list.param<span class="sc">$</span>g2))<span class="sc">$</span>mixt.data</span>
-<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a>C.sim <span class="ot">&lt;-</span> <span class="fu">rsimmix</span>(<span class="at">n=</span><span class="dv">6000</span>, <span class="at">unknownComp_weight=</span><span class="fl">0.65</span>, <span class="at">comp.dist =</span> <span class="fu">list</span>(list.comp<span class="sc">$</span>f3,list.comp<span class="sc">$</span>g3),</span>
-<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a>                 <span class="at">comp.param =</span> <span class="fu">list</span>(list.param<span class="sc">$</span>f3, list.param<span class="sc">$</span>g3))<span class="sc">$</span>mixt.data</span>
-<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a>D.sim <span class="ot">&lt;-</span> <span class="fu">rsimmix</span>(<span class="at">n=</span><span class="dv">6000</span>, <span class="at">unknownComp_weight=</span><span class="fl">0.75</span>, <span class="at">comp.dist =</span> <span class="fu">list</span>(list.comp<span class="sc">$</span>f4,list.comp<span class="sc">$</span>g4),</span>
-<span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a>                 <span class="at">comp.param =</span> <span class="fu">list</span>(list.param<span class="sc">$</span>f4, list.param<span class="sc">$</span>g4))<span class="sc">$</span>mixt.data</span>
-<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a>E.sim <span class="ot">&lt;-</span> <span class="fu">rsimmix</span>(<span class="at">n=</span><span class="dv">6000</span>, <span class="at">unknownComp_weight=</span><span class="fl">0.55</span>, <span class="at">comp.dist =</span> <span class="fu">list</span>(list.comp<span class="sc">$</span>f5,list.comp<span class="sc">$</span>g5),</span>
-<span id="cb4-21"><a href="#cb4-21" tabindex="-1"></a>                 <span class="at">comp.param =</span> <span class="fu">list</span>(list.param<span class="sc">$</span>f5, list.param<span class="sc">$</span>g5))<span class="sc">$</span>mixt.data</span>
-<span id="cb4-22"><a href="#cb4-22" tabindex="-1"></a><span class="do">## Look for the clusters:</span></span>
-<span id="cb4-23"><a href="#cb4-23" tabindex="-1"></a>list.comp <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">f1 =</span> <span class="cn">NULL</span>, <span class="at">g1 =</span> <span class="st">&quot;exp&quot;</span>,</span>
-<span id="cb4-24"><a href="#cb4-24" tabindex="-1"></a>                  <span class="at">f2 =</span> <span class="cn">NULL</span>, <span class="at">g2 =</span> <span class="st">&quot;exp&quot;</span>,</span>
-<span id="cb4-25"><a href="#cb4-25" tabindex="-1"></a>                  <span class="at">f3 =</span> <span class="cn">NULL</span>, <span class="at">g3 =</span> <span class="st">&quot;gamma&quot;</span>,</span>
-<span id="cb4-26"><a href="#cb4-26" tabindex="-1"></a>                  <span class="at">f4 =</span> <span class="cn">NULL</span>, <span class="at">g4 =</span> <span class="st">&quot;exp&quot;</span>,</span>
-<span id="cb4-27"><a href="#cb4-27" tabindex="-1"></a>                  <span class="at">f5 =</span> <span class="cn">NULL</span>, <span class="at">g5 =</span> <span class="st">&quot;exp&quot;</span>)</span>
-<span id="cb4-28"><a href="#cb4-28" tabindex="-1"></a>list.param <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">f1 =</span> <span class="cn">NULL</span>, <span class="at">g1 =</span> <span class="fu">list</span>(<span class="at">rate =</span> <span class="dv">1</span><span class="sc">/</span><span class="fl">3.5</span>),</span>
-<span id="cb4-29"><a href="#cb4-29" tabindex="-1"></a>                   <span class="at">f2 =</span> <span class="cn">NULL</span>, <span class="at">g2 =</span> <span class="fu">list</span>(<span class="at">rate =</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">5</span>),</span>
-<span id="cb4-30"><a href="#cb4-30" tabindex="-1"></a>                   <span class="at">f3 =</span> <span class="cn">NULL</span>, <span class="at">g3 =</span> <span class="fu">list</span>(<span class="at">shape =</span> <span class="dv">12</span>, <span class="at">rate =</span> <span class="dv">2</span>),</span>
-<span id="cb4-31"><a href="#cb4-31" tabindex="-1"></a>                   <span class="at">f4 =</span> <span class="cn">NULL</span>, <span class="at">g4 =</span> <span class="fu">list</span>(<span class="at">rate =</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">7</span>),</span>
-<span id="cb4-32"><a href="#cb4-32" tabindex="-1"></a>                   <span class="at">f5 =</span> <span class="cn">NULL</span>, <span class="at">g5 =</span> <span class="fu">list</span>(<span class="at">rate =</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">6</span>))</span>
-<span id="cb4-33"><a href="#cb4-33" tabindex="-1"></a>clusters <span class="ot">&lt;-</span> <span class="fu">admix_clustering</span>(<span class="at">samples =</span> <span class="fu">list</span>(A.sim,B.sim,C.sim,D.sim,E.sim), <span class="at">n_sim_tab =</span> <span class="dv">10</span>,</span>
-<span id="cb4-34"><a href="#cb4-34" tabindex="-1"></a>                             <span class="at">comp.dist=</span>list.comp, <span class="at">comp.param=</span>list.param, <span class="at">parallel=</span><span class="cn">FALSE</span>, <span class="at">n_cpu=</span><span class="dv">2</span>)</span>
-<span id="cb4-35"><a href="#cb4-35" tabindex="-1"></a><span class="co">#&gt;   |                                                          |                                                  |   0%  |                                                          |====                                              |   8%  |                                                          |==============================                    |  60%  |                                                          |========================================          |  80%  |                                                          |==================================================| 100%</span></span>
-<span id="cb4-36"><a href="#cb4-36" tabindex="-1"></a>clusters</span>
-<span id="cb4-37"><a href="#cb4-37" tabindex="-1"></a><span class="co">#&gt; Call:</span></span>
-<span id="cb4-38"><a href="#cb4-38" tabindex="-1"></a><span class="co">#&gt; admix_clustering(samples = list(A.sim, B.sim, C.sim, D.sim, E.sim), </span></span>
-<span id="cb4-39"><a href="#cb4-39" tabindex="-1"></a><span class="co">#&gt;     n_sim_tab = 10, comp.dist = list.comp, comp.param = list.param, </span></span>
-<span id="cb4-40"><a href="#cb4-40" tabindex="-1"></a><span class="co">#&gt;     parallel = FALSE, n_cpu = 2)</span></span>
-<span id="cb4-41"><a href="#cb4-41" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb4-42"><a href="#cb4-42" tabindex="-1"></a><span class="co">#&gt; The number of populations/samples under study is 5.</span></span>
-<span id="cb4-43"><a href="#cb4-43" tabindex="-1"></a><span class="co">#&gt; The level of the underlying k-sample testing procedure is set to 5%.</span></span>
-<span id="cb4-44"><a href="#cb4-44" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb4-45"><a href="#cb4-45" tabindex="-1"></a><span class="co">#&gt; The number of detected clusters in these populations equals 3.</span></span>
-<span id="cb4-46"><a href="#cb4-46" tabindex="-1"></a><span class="co">#&gt; The p-values of the k-sample tests (showing when to close the clusters (i.e. p-value &lt; 0.05) equal: 0.556, 0, 0, 0.857.</span></span>
-<span id="cb4-47"><a href="#cb4-47" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb4-48"><a href="#cb4-48" tabindex="-1"></a><span class="co">#&gt; The list of clusters with populations belonging to them (in numeric format, i.e. inside c()) :</span></span>
-<span id="cb4-49"><a href="#cb4-49" tabindex="-1"></a><span class="co">#&gt;    - Cluster #1: vector of populations c(1, 3)</span></span>
-<span id="cb4-50"><a href="#cb4-50" tabindex="-1"></a><span class="co">#&gt;   - Cluster #2: vector of populations 4</span></span>
-<span id="cb4-51"><a href="#cb4-51" tabindex="-1"></a><span class="co">#&gt;   - Cluster #3: vector of populations c(2, 5)</span></span>
-<span id="cb4-52"><a href="#cb4-52" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb4-53"><a href="#cb4-53" tabindex="-1"></a><span class="co">#&gt; The list of estimated weights for the unknown component distributions in each detected cluster</span></span>
-<span id="cb4-54"><a href="#cb4-54" tabindex="-1"></a><span class="co">#&gt;       (in the same format and order as listed populations for clusters just above) :</span></span>
-<span id="cb4-55"><a href="#cb4-55" tabindex="-1"></a><span class="co">#&gt;    - estimated weights of the unknown component distributions for cluster  1 :  c(0.797839734013291, 0.619500508134639)</span></span>
-<span id="cb4-56"><a href="#cb4-56" tabindex="-1"></a><span class="co">#&gt;   - estimated weights of the unknown component distributions for cluster  2 :  numeric(0)</span></span>
-<span id="cb4-57"><a href="#cb4-57" tabindex="-1"></a><span class="co">#&gt;   - estimated weights of the unknown component distributions for cluster  3 :  c(0.573687909599797, 0.629136693101988)</span></span>
-<span id="cb4-58"><a href="#cb4-58" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb4-59"><a href="#cb4-59" tabindex="-1"></a><span class="co">#&gt; The matrix giving the distances between populations, used in the clustering procedure through the k-sample tests:</span></span>
-<span id="cb4-60"><a href="#cb4-60" tabindex="-1"></a><span class="co">#&gt;             [,1]        [,2]        [,3]      [,4]        [,5]</span></span>
-<span id="cb4-61"><a href="#cb4-61" tabindex="-1"></a><span class="co">#&gt; [1,]  0.00000000 30.96428162  0.02947413  7.001645 35.09156510</span></span>
-<span id="cb4-62"><a href="#cb4-62" tabindex="-1"></a><span class="co">#&gt; [2,] 30.96428162  0.00000000 19.81562521  4.223762  0.03876151</span></span>
-<span id="cb4-63"><a href="#cb4-63" tabindex="-1"></a><span class="co">#&gt; [3,]  0.02947413 19.81562521  0.00000000 65.371758 13.24943788</span></span>
-<span id="cb4-64"><a href="#cb4-64" tabindex="-1"></a><span class="co">#&gt; [4,]  7.00164538  4.22376209 65.37175813  0.000000  2.39935356</span></span>
-<span id="cb4-65"><a href="#cb4-65" tabindex="-1"></a><span class="co">#&gt; [5,] 35.09156510  0.03876151 13.24943788  2.399354  0.00000000</span></span></code></pre></div>
+<p>We present a case study with 5 populations to cluster on <span class="math inline">\(\mathbb{R}^+\)</span>, with Gamma-Exponential,
+Exponential-Exponential and Gamma-Gamma mixtures.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="do">## Simulate mixture data:</span></span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>mixt1 <span class="ot">&lt;-</span> <span class="fu">twoComp_mixt</span>(<span class="at">n =</span> <span class="dv">6000</span>, <span class="at">weight =</span> <span class="fl">0.8</span>,</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>                      <span class="at">comp.dist =</span> <span class="fu">list</span>(<span class="st">&quot;gamma&quot;</span>, <span class="st">&quot;exp&quot;</span>),</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>                      <span class="at">comp.param =</span> <span class="fu">list</span>(<span class="fu">list</span>(<span class="st">&quot;shape&quot;</span> <span class="ot">=</span> <span class="dv">16</span>, <span class="st">&quot;scale&quot;</span> <span class="ot">=</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">4</span>),</span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>                                        <span class="fu">list</span>(<span class="st">&quot;rate&quot;</span> <span class="ot">=</span> <span class="dv">1</span><span class="sc">/</span><span class="fl">3.5</span>)))</span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>mixt2 <span class="ot">&lt;-</span> <span class="fu">twoComp_mixt</span>(<span class="at">n =</span> <span class="dv">6000</span>, <span class="at">weight =</span> <span class="fl">0.7</span>,</span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>                      <span class="at">comp.dist =</span> <span class="fu">list</span>(<span class="st">&quot;gamma&quot;</span>, <span class="st">&quot;exp&quot;</span>),</span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a>                      <span class="at">comp.param =</span> <span class="fu">list</span>(<span class="fu">list</span>(<span class="st">&quot;shape&quot;</span> <span class="ot">=</span> <span class="dv">14</span>, <span class="st">&quot;scale&quot;</span> <span class="ot">=</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">2</span>),</span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a>                                        <span class="fu">list</span>(<span class="st">&quot;rate&quot;</span> <span class="ot">=</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">5</span>)))</span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a>mixt3 <span class="ot">&lt;-</span> <span class="fu">twoComp_mixt</span>(<span class="at">n =</span> <span class="dv">6000</span>, <span class="at">weight =</span> <span class="fl">0.6</span>,</span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a>                      <span class="at">comp.dist =</span> <span class="fu">list</span>(<span class="st">&quot;gamma&quot;</span>, <span class="st">&quot;gamma&quot;</span>),</span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a>                      <span class="at">comp.param =</span> <span class="fu">list</span>(<span class="fu">list</span>(<span class="st">&quot;shape&quot;</span> <span class="ot">=</span> <span class="dv">16</span>, <span class="st">&quot;scale&quot;</span> <span class="ot">=</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">4</span>),</span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a>                                        <span class="fu">list</span>(<span class="st">&quot;shape&quot;</span> <span class="ot">=</span> <span class="dv">12</span>, <span class="st">&quot;scale&quot;</span> <span class="ot">=</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">2</span>)))</span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a>mixt4 <span class="ot">&lt;-</span> <span class="fu">twoComp_mixt</span>(<span class="at">n =</span> <span class="dv">6000</span>, <span class="at">weight =</span> <span class="fl">0.5</span>,</span>
+<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a>                      <span class="at">comp.dist =</span> <span class="fu">list</span>(<span class="st">&quot;exp&quot;</span>, <span class="st">&quot;exp&quot;</span>),</span>
+<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a>                      <span class="at">comp.param =</span> <span class="fu">list</span>(<span class="fu">list</span>(<span class="st">&quot;rate&quot;</span> <span class="ot">=</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">2</span>),</span>
+<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a>                                        <span class="fu">list</span>(<span class="st">&quot;rate&quot;</span> <span class="ot">=</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">7</span>)))</span>
+<span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a>mixt5 <span class="ot">&lt;-</span> <span class="fu">twoComp_mixt</span>(<span class="at">n =</span> <span class="dv">6000</span>, <span class="at">weight =</span> <span class="fl">0.5</span>,</span>
+<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a>                      <span class="at">comp.dist =</span> <span class="fu">list</span>(<span class="st">&quot;gamma&quot;</span>, <span class="st">&quot;exp&quot;</span>),</span>
+<span id="cb4-21"><a href="#cb4-21" tabindex="-1"></a>                      <span class="at">comp.param =</span> <span class="fu">list</span>(<span class="fu">list</span>(<span class="st">&quot;shape&quot;</span> <span class="ot">=</span> <span class="dv">14</span>, <span class="st">&quot;scale&quot;</span> <span class="ot">=</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">2</span>),</span>
+<span id="cb4-22"><a href="#cb4-22" tabindex="-1"></a>                                        <span class="fu">list</span>(<span class="st">&quot;rate&quot;</span> <span class="ot">=</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">6</span>)))</span>
+<span id="cb4-23"><a href="#cb4-23" tabindex="-1"></a>data1 <span class="ot">&lt;-</span> <span class="fu">getmixtData</span>(mixt1)</span>
+<span id="cb4-24"><a href="#cb4-24" tabindex="-1"></a>data2 <span class="ot">&lt;-</span> <span class="fu">getmixtData</span>(mixt2)</span>
+<span id="cb4-25"><a href="#cb4-25" tabindex="-1"></a>data3 <span class="ot">&lt;-</span> <span class="fu">getmixtData</span>(mixt3)</span>
+<span id="cb4-26"><a href="#cb4-26" tabindex="-1"></a>data4 <span class="ot">&lt;-</span> <span class="fu">getmixtData</span>(mixt4)</span>
+<span id="cb4-27"><a href="#cb4-27" tabindex="-1"></a>data5 <span class="ot">&lt;-</span> <span class="fu">getmixtData</span>(mixt5)</span>
+<span id="cb4-28"><a href="#cb4-28" tabindex="-1"></a>admixMod1 <span class="ot">&lt;-</span> <span class="fu">admix_model</span>(<span class="at">knownComp_dist =</span> mixt1<span class="sc">$</span>comp.dist[[<span class="dv">2</span>]],</span>
+<span id="cb4-29"><a href="#cb4-29" tabindex="-1"></a>                         <span class="at">knownComp_param =</span> mixt1<span class="sc">$</span>comp.param[[<span class="dv">2</span>]])</span>
+<span id="cb4-30"><a href="#cb4-30" tabindex="-1"></a>admixMod2 <span class="ot">&lt;-</span> <span class="fu">admix_model</span>(<span class="at">knownComp_dist =</span> mixt2<span class="sc">$</span>comp.dist[[<span class="dv">2</span>]],</span>
+<span id="cb4-31"><a href="#cb4-31" tabindex="-1"></a>                         <span class="at">knownComp_param =</span> mixt2<span class="sc">$</span>comp.param[[<span class="dv">2</span>]])</span>
+<span id="cb4-32"><a href="#cb4-32" tabindex="-1"></a>admixMod3 <span class="ot">&lt;-</span> <span class="fu">admix_model</span>(<span class="at">knownComp_dist =</span> mixt3<span class="sc">$</span>comp.dist[[<span class="dv">2</span>]],</span>
+<span id="cb4-33"><a href="#cb4-33" tabindex="-1"></a>                         <span class="at">knownComp_param =</span> mixt3<span class="sc">$</span>comp.param[[<span class="dv">2</span>]])</span>
+<span id="cb4-34"><a href="#cb4-34" tabindex="-1"></a>admixMod4 <span class="ot">&lt;-</span> <span class="fu">admix_model</span>(<span class="at">knownComp_dist =</span> mixt4<span class="sc">$</span>comp.dist[[<span class="dv">2</span>]],</span>
+<span id="cb4-35"><a href="#cb4-35" tabindex="-1"></a>                         <span class="at">knownComp_param =</span> mixt4<span class="sc">$</span>comp.param[[<span class="dv">2</span>]])</span>
+<span id="cb4-36"><a href="#cb4-36" tabindex="-1"></a>admixMod5 <span class="ot">&lt;-</span> <span class="fu">admix_model</span>(<span class="at">knownComp_dist =</span> mixt5<span class="sc">$</span>comp.dist[[<span class="dv">2</span>]],</span>
+<span id="cb4-37"><a href="#cb4-37" tabindex="-1"></a>                         <span class="at">knownComp_param =</span> mixt5<span class="sc">$</span>comp.param[[<span class="dv">2</span>]])</span>
+<span id="cb4-38"><a href="#cb4-38" tabindex="-1"></a><span class="do">## Look for the clusters:</span></span>
+<span id="cb4-39"><a href="#cb4-39" tabindex="-1"></a><span class="fu">admix_cluster</span>(<span class="at">samples =</span> <span class="fu">list</span>(data1,data2,data3,data4,data5), </span>
+<span id="cb4-40"><a href="#cb4-40" tabindex="-1"></a>              <span class="at">admixMod =</span> <span class="fu">list</span>(admixMod1,admixMod2,admixMod3,admixMod4,admixMod5),</span>
+<span id="cb4-41"><a href="#cb4-41" tabindex="-1"></a>              <span class="at">conf_level =</span> <span class="fl">0.95</span>, <span class="at">n_sim_tab =</span> <span class="dv">10</span>, <span class="at">tune_penalty =</span> <span class="cn">FALSE</span>, <span class="at">tabul_dist =</span> <span class="cn">NULL</span>, </span>
+<span id="cb4-42"><a href="#cb4-42" tabindex="-1"></a>              <span class="at">echo =</span> <span class="cn">FALSE</span>, <span class="at">parallel =</span> <span class="cn">FALSE</span>, <span class="at">n_cpu =</span> <span class="dv">2</span>)</span>
+<span id="cb4-43"><a href="#cb4-43" tabindex="-1"></a><span class="co">#&gt; Call:</span></span>
+<span id="cb4-44"><a href="#cb4-44" tabindex="-1"></a><span class="co">#&gt; admix_cluster(samples = list(data1, data2, data3, data4, data5), </span></span>
+<span id="cb4-45"><a href="#cb4-45" tabindex="-1"></a><span class="co">#&gt;     admixMod = list(admixMod1, admixMod2, admixMod3, admixMod4, </span></span>
+<span id="cb4-46"><a href="#cb4-46" tabindex="-1"></a><span class="co">#&gt;         admixMod5), conf_level = 0.95, n_sim_tab = 10, tune_penalty = FALSE, </span></span>
+<span id="cb4-47"><a href="#cb4-47" tabindex="-1"></a><span class="co">#&gt;     tabul_dist = NULL, echo = FALSE, parallel = FALSE, n_cpu = 2)</span></span>
+<span id="cb4-48"><a href="#cb4-48" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb4-49"><a href="#cb4-49" tabindex="-1"></a><span class="co">#&gt; Number of detected clusters across the samples provided: 3.</span></span>
+<span id="cb4-50"><a href="#cb4-50" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb4-51"><a href="#cb4-51" tabindex="-1"></a><span class="co">#&gt; List of samples involved in each built cluster (in numeric format, i.e. inside c()) :</span></span>
+<span id="cb4-52"><a href="#cb4-52" tabindex="-1"></a><span class="co">#&gt;   - Cluster #1: vector of populations c(1, 3)</span></span>
+<span id="cb4-53"><a href="#cb4-53" tabindex="-1"></a><span class="co">#&gt;   - Cluster #2: vector of populations 4</span></span>
+<span id="cb4-54"><a href="#cb4-54" tabindex="-1"></a><span class="co">#&gt;   - Cluster #3: vector of populations c(2, 5)</span></span></code></pre></div>
 <div id="refs" class="references csl-bib-body hanging-indent">
-<div id="ref-MilhaudCluster23" class="csl-entry">
-Milhaud, Pommeret, X., and P. Vandekerkhove. 2023.
-<span>“Contamination-Source Based k-Sample Clustering.”</span> <a href="https://hal.science/hal-04129130">https://hal.science/hal-04129130</a>.
+<div id="ref-MilhaudPommeretSalhiVandekerkhove2024b" class="csl-entry">
+Milhaud, Xavier, Denys Pommeret, Yahia Salhi, and Pierre Vandekerkhove.
+2024. <span>“Contamination-Source Based k-Sample Clustering.”</span>
+<em>Journal of Machine Learning Research</em> 25 (287): 1–32. <a href="https://jmlr.org/papers/v25/23-0914.html">https://jmlr.org/papers/v25/23-0914.html</a>.
 </div>
 </div>
 </div>

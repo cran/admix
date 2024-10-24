@@ -368,7 +368,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <p>We remind that a random variable <span class="math inline">\(X\)</span> following an admixture distribution has
 cumulative distribution function (cdf) <span class="math inline">\(L\)</span> given by <span class="math display">\[L(x) = pF(x) + (1-p)G(x), \qquad x \in
 \mathbb{R},\]</span> where <span class="math inline">\(G\)</span> is a
-mixture component whose distribution is perfectly known, whereas <span class="math inline">\(p\)</span> and <span class="math inline">\(F\)</span> are unknown.\ In this setting, if no
+mixture component whose distribution is perfectly known, whereas <span class="math inline">\(p\)</span> and <span class="math inline">\(F\)</span> are unknown. In this setting, if no
 parametric assumption is made on the unknown component distribution
 <span class="math inline">\(F\)</span>, the mixture is considered as a
 semiparametric mixture. For an overview on semiparametric extensions of
@@ -377,13 +377,13 @@ finite mixture models, see <span class="citation">(Xiang and Yang
 <p>The goal of this vignette is to introduce the functionalities that
 enable to perform hypothesis tests on the unknown component distribution
 <span class="math inline">\(F\)</span>. We aim to test whether <span class="math inline">\(F\)</span> belongs to certain parametric family
-with specified parameters in a one-sample case, or if two different
+(e.g. the Gaussian one) in a 1-sample case, or if two different
 decontaminated versions of <span class="math inline">\(F_1\)</span> and
 <span class="math inline">\(F_2\)</span> (obtained from two observed
 samples <span class="math inline">\(X_1\)</span> and <span class="math inline">\(X_2\)</span>) are similar in the K-sample case
 (<span class="math inline">\(K \geq 2\)</span>). All the specific tests
 presented hereafter can be performed using one single generic function
-for testing with appropriate arguments, the so-called <span class="math inline">\(admix_test\)</span> function.</p>
+for testing with appropriate arguments, the so-called <span class="math inline">\(admix\_test\)</span> function.</p>
 <div id="the-one-sample-case-only-available-to-symmetric-unknown-density" class="section level1">
 <h1>The one-sample case only available to symmetric unknown density</h1>
 <p>In this setting, the test to be performed is a parametric family
@@ -391,49 +391,56 @@ testing, i.e. <span class="math display">\[H_0: \, F\in \mathcal{F}
 \qquad \mbox{against} \qquad  H_1: \, F\notin \mathcal{F},\]</span>
 where <span class="math inline">\(\mathcal{F}=\left\{F_\theta:~\theta\in
 \Theta \right\}\)</span>.</p>
-<p>The support of the known component density has to be identical to the
+<p>The support of the known component density has to be in line with the
 one of the unknown component density. Such tests have been introduced in
-<span class="citation">(Pommeret and Vandekerkhove 2019)</span>. The
-idea underlying the hypothesis test in the one-sample case is basically
-always the same:</p>
+<span class="citation">(Pommeret and Vandekerkhove 2019)</span>, and the
+idea underlying this hypothesis test follows these steps:</p>
 <ol style="list-style-type: decimal">
-<li>decompose the observed or known densities in an orthonormal
-polynomial basis,</li>
+<li>decompose the observed density and the known density in an
+orthonormal polynomial basis,</li>
 <li>get the expansion coefficients of such densities,</li>
-<li>reformulate the null hypothesis of the test with these
+<li>reformulate the null hypothesis of the test using these
 coefficients,</li>
 <li>adopt a <span class="math inline">\(\chi^2\)</span> test strategy
 that relies on Central Limit Theorem (CLT) results on estimators of the
 (unknown) weight related to the unknown component distribution <span class="math inline">\(F\)</span>.</li>
 </ol>
-<p>Taking into account this, it is not possible to use the estimator
-provided in <span class="citation">(Patra and Sen 2016)</span> to
-perform hypothesis testing. On the contrary, <span class="citation">Bordes and Vandekerkhove (2010)</span> propose an
-asymptotically normal estimator that can be used if the unknown
-component density is assumed to be symmetric. More generally, <span class="citation">Pommeret and Vandekerkhove (2019)</span> give more
-details about the statistic distribution under the null hypothesis <span class="math inline">\(H_0\)</span> and under the alternative <span class="math inline">\(H_1\)</span>.</p>
+<p>Because of the use of asymptotically normal estimators, it is not
+possible to use the estimator provided in <span class="citation">(Patra
+and Sen 2016)</span> to perform hypothesis testing. On the contrary,
+<span class="citation">Bordes and Vandekerkhove (2010)</span> propose an
+estimator that can be used if the unknown component density is assumed
+to be symmetric. More generally, <span class="citation">Pommeret and
+Vandekerkhove (2019)</span> give more details about the distribution of
+the test statistic under the null (hypothesis <span class="math inline">\(H_0\)</span>), and under the alternative <span class="math inline">\(H_1\)</span>.</p>
 <p>Here, the implemented function allows to perform the so-called
-gaussianity test, meaning that the parametric family against with the
+Gaussianity test, meaning that the parametric family against which the
 unknown component is tested belongs to Gaussian distributions. Below is
-an example of hypothesis testing in the one-sample case:</p>
+an example of hypothesis testing in this 1-sample case:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="do">####### Under the null hypothesis H0.</span></span>
-<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="do">## Parameters of the gaussian distribution to be tested:</span></span>
-<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>list.comp <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">f =</span> <span class="st">&#39;norm&#39;</span>, <span class="at">g =</span> <span class="st">&#39;norm&#39;</span>)</span>
-<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>list.param <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">f =</span> <span class="fu">c</span>(<span class="at">mean =</span> <span class="dv">2</span>, <span class="at">sd =</span> <span class="fl">0.5</span>), <span class="at">g =</span> <span class="fu">c</span>(<span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> <span class="dv">1</span>))</span>
-<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="do">## Simulate data:</span></span>
-<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>obs.data <span class="ot">&lt;-</span> <span class="fu">rsimmix</span>(<span class="at">n =</span> <span class="dv">700</span>, <span class="at">unknownComp_weight =</span> <span class="fl">0.8</span>, <span class="at">comp.dist =</span> list.comp,</span>
-<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>                    <span class="at">comp.param =</span> list.param)[[<span class="st">&#39;mixt.data&#39;</span>]]</span>
-<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="do">## Performs the test:</span></span>
-<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>list.comp <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">f =</span> <span class="cn">NULL</span>, <span class="at">g =</span> <span class="st">&#39;norm&#39;</span>)</span>
-<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>list.param <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">f =</span> <span class="cn">NULL</span>, <span class="at">g =</span> <span class="fu">c</span>(<span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> <span class="dv">1</span>))</span>
-<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="fu">gaussianity_test</span>(<span class="at">sample1 =</span> obs.data, <span class="at">comp.dist =</span> list.comp, <span class="at">comp.param =</span> list.param,</span>
-<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a>                 <span class="at">K =</span> <span class="dv">3</span>, <span class="at">lambda =</span> <span class="fl">0.1</span>, <span class="at">support =</span> <span class="st">&#39;Real&#39;</span>)<span class="sc">$</span>rejection_rule</span>
-<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a><span class="co">#&gt; [1] FALSE</span></span></code></pre></div>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="do">## Simulate mixture data:</span></span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>mixt1 <span class="ot">&lt;-</span> <span class="fu">twoComp_mixt</span>(<span class="at">n =</span> <span class="dv">300</span>, <span class="at">weight =</span> <span class="fl">0.6</span>,</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>                      <span class="at">comp.dist =</span> <span class="fu">list</span>(<span class="st">&quot;norm&quot;</span>, <span class="st">&quot;norm&quot;</span>),</span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>                      <span class="at">comp.param =</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">&quot;mean&quot;</span> <span class="ot">=</span> <span class="dv">2</span>, <span class="st">&quot;sd&quot;</span> <span class="ot">=</span> <span class="fl">0.5</span>),</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>                                        <span class="fu">c</span>(<span class="st">&quot;mean&quot;</span> <span class="ot">=</span> <span class="dv">0</span>, <span class="st">&quot;sd&quot;</span> <span class="ot">=</span> <span class="dv">1</span>)))</span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>data1 <span class="ot">&lt;-</span> <span class="fu">getmixtData</span>(mixt1)</span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="do">## Define the admixture model:</span></span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>admixMod <span class="ot">&lt;-</span> <span class="fu">admix_model</span>(<span class="at">knownComp_dist =</span> mixt1<span class="sc">$</span>comp.dist[[<span class="dv">2</span>]],</span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>                        <span class="at">knownComp_param =</span> mixt1<span class="sc">$</span>comp.param[[<span class="dv">2</span>]])</span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="fu">admix_test</span>(<span class="at">samples =</span> <span class="fu">list</span>(data1), <span class="at">admixMod =</span> <span class="fu">list</span>(admixMod),</span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a>           <span class="at">test_method =</span> <span class="st">&quot;poly&quot;</span>, <span class="at">ask_poly_param =</span> <span class="cn">FALSE</span>, <span class="at">support =</span> <span class="st">&quot;Real&quot;</span>,</span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a>           <span class="at">conf_level =</span> <span class="fl">0.95</span>, <span class="at">parallel =</span> <span class="cn">FALSE</span>, <span class="at">n_cpu =</span> <span class="dv">2</span>)</span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a><span class="co">#&gt; Call:admix_test(samples = list(data1), admixMod = list(admixMod), </span></span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a><span class="co">#&gt;     test_method = &quot;poly&quot;, ask_poly_param = FALSE, support = &quot;Real&quot;, </span></span>
+<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a><span class="co">#&gt;     conf_level = 0.95, parallel = FALSE, n_cpu = 2)</span></span>
+<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a><span class="co">#&gt; Do we reject the null hypothesis? No</span></span>
+<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a><span class="co">#&gt; Here is the associated p-value of the test: 0.789</span></span></code></pre></div>
 <p>The result of the test is that we cannot reject the null hypothesis
 <span class="math inline">\(H_0\)</span>, which is in line with the
-specified parameters of the unknown components. Indeed, simulated data
-have a normally-distributed unknown component, i.e. <span class="math inline">\(F \sim \mathcal{N}(\mu,\sigma)\)</span> where
-<span class="math inline">\(\mu=3\)</span> and <span class="math inline">\(\sigma=0.5\)</span>.</p>
+specified distribution for the unknown component. Indeed, simulated data
+is a Gaussian mixture with two components, i.e. <span class="math inline">\(F \sim \mathcal{N}(\mu,\sigma)\)</span> where
+<span class="math inline">\(\mu=2\)</span> and <span class="math inline">\(\sigma=0.5\)</span>.</p>
 </div>
 <div id="the-two-sample-case" class="section level1">
 <h1>The two-sample case</h1>
@@ -452,75 +459,76 @@ F_1\neq F_2.\]</span></p>
 <h2>Case of symmetric unknown densities</h2>
 <p>In this framework, we assume that <span class="math inline">\(F_1\)</span> and <span class="math inline">\(F_2\)</span> both have a symmetric density. This
 way the normally-distributed estimator of <span class="math inline">\(p_1\)</span> and <span class="math inline">\(p_2\)</span>, proposed in <span class="citation">(Bordes and Vandekerkhove 2010)</span>, can be used
-together with the testing strategy suggested in <span class="citation">(Milhaud and Vandekerkhove 2022a)</span>. This testing
-strategy is closely connected to <span class="citation">(Pommeret and
-Vandekerkhove 2019)</span>, where the computation of the expansion
-coefficients is duplicated on each of the two samples under study.</p>
+together with the testing strategy suggested in <span class="citation">(Milhaud et al. 2022)</span>. This testing strategy is
+closely connected to <span class="citation">(Pommeret and Vandekerkhove
+2019)</span>, where the computation of the expansion coefficients is
+duplicated on each of the two samples under study.</p>
 <p>In what follows, we simulate two samples under the null and check
 whether the test provides satisfactory results.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="do">##### Under the null hypothesis H0.</span></span>
-<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="do">## Simulate data:</span></span>
-<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>list.comp <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">f1 =</span> <span class="st">&#39;norm&#39;</span>, <span class="at">g1 =</span> <span class="st">&#39;norm&#39;</span>,</span>
-<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>                  <span class="at">f2 =</span> <span class="st">&#39;norm&#39;</span>, <span class="at">g2 =</span> <span class="st">&#39;norm&#39;</span>)</span>
-<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>list.param <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">f1 =</span> <span class="fu">list</span>(<span class="at">mean =</span> <span class="dv">3</span>, <span class="at">sd =</span> <span class="fl">0.5</span>), <span class="at">g1 =</span> <span class="fu">list</span>(<span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> <span class="dv">1</span>),</span>
-<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>                   <span class="at">f2 =</span> <span class="fu">list</span>(<span class="at">mean =</span> <span class="dv">3</span>, <span class="at">sd =</span> <span class="fl">0.5</span>), <span class="at">g2 =</span> <span class="fu">list</span>(<span class="at">mean =</span> <span class="dv">6</span>, <span class="at">sd =</span> <span class="fl">1.2</span>))</span>
-<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a>sample1 <span class="ot">&lt;-</span> <span class="fu">rsimmix</span>(<span class="at">n=</span><span class="dv">1000</span>, <span class="at">unknownComp_weight=</span><span class="fl">0.8</span>, <span class="at">comp.dist =</span> <span class="fu">list</span>(list.comp<span class="sc">$</span>f1,list.comp<span class="sc">$</span>g1),</span>
-<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>                   <span class="at">comp.param =</span> <span class="fu">list</span>(list.param<span class="sc">$</span>f1,list.param<span class="sc">$</span>g1))[[<span class="st">&#39;mixt.data&#39;</span>]]</span>
-<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a>sample2 <span class="ot">&lt;-</span> <span class="fu">rsimmix</span>(<span class="at">n=</span><span class="dv">1100</span>, <span class="at">unknownComp_weight=</span><span class="fl">0.7</span>, <span class="at">comp.dist =</span> <span class="fu">list</span>(list.comp<span class="sc">$</span>f2,list.comp<span class="sc">$</span>g2),</span>
-<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a>                   <span class="at">comp.param =</span> <span class="fu">list</span>(list.param<span class="sc">$</span>f2,list.param<span class="sc">$</span>g2))[[<span class="st">&#39;mixt.data&#39;</span>]]</span>
-<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a><span class="fu">plot_mixt_density</span>(<span class="at">samples =</span> <span class="fu">list</span>(sample1,sample2), <span class="at">user.bounds =</span> <span class="cn">NULL</span>, <span class="at">support=</span><span class="st">&#39;continuous&#39;</span>)</span></code></pre></div>
-<p><img src="data:image/png;base64,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" /><!-- --></p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="do">##### Performs the test:</span></span>
-<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>list.comp <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">f1 =</span> <span class="cn">NULL</span>, <span class="at">g1 =</span> <span class="st">&#39;norm&#39;</span>,</span>
-<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>                  <span class="at">f2 =</span> <span class="cn">NULL</span>, <span class="at">g2 =</span> <span class="st">&#39;norm&#39;</span>)</span>
-<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>list.param <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">f1 =</span> <span class="cn">NULL</span>, <span class="at">g1 =</span> <span class="fu">list</span>(<span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> <span class="dv">1</span>),</span>
-<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>                   <span class="at">f2 =</span> <span class="cn">NULL</span>, <span class="at">g2 =</span> <span class="fu">list</span>(<span class="at">mean =</span> <span class="dv">6</span>, <span class="at">sd =</span> <span class="fl">1.2</span>))</span>
-<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="do">## Using expansion coefficients in orthonormal polynomial basis:</span></span>
-<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="fu">two_samples_test</span>(<span class="at">samples =</span> <span class="fu">list</span>(sample1,sample2), <span class="at">comp.dist =</span> list.comp,</span>
-<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>                 <span class="at">comp.param =</span> list.param, <span class="at">method =</span> <span class="st">&#39;Poly&#39;</span>, <span class="at">K =</span> <span class="dv">3</span>, <span class="at">support =</span> <span class="st">&#39;Real&#39;</span>,</span>
-<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a>                 <span class="at">est.method =</span> <span class="st">&#39;BVdk&#39;</span>, <span class="at">s =</span> <span class="fl">0.3</span>, <span class="at">nb.ssEch=</span><span class="dv">2</span>, <span class="at">var.explicit =</span> <span class="cn">TRUE</span>)<span class="sc">$</span>rejection_rule</span>
-<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="co">#&gt; [1] FALSE</span></span></code></pre></div>
-<p>The hypothesis test conclude that the null hypothesis cannot be
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>mixt1 <span class="ot">&lt;-</span> <span class="fu">twoComp_mixt</span>(<span class="at">n =</span> <span class="dv">350</span>, <span class="at">weight =</span> <span class="fl">0.8</span>,</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>                      <span class="at">comp.dist =</span> <span class="fu">list</span>(<span class="st">&quot;norm&quot;</span>, <span class="st">&quot;norm&quot;</span>),</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>                      <span class="at">comp.param =</span> <span class="fu">list</span>(<span class="fu">list</span>(<span class="st">&quot;mean&quot;</span> <span class="ot">=</span> <span class="dv">3</span>, <span class="st">&quot;sd&quot;</span> <span class="ot">=</span> <span class="fl">0.5</span>),</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>                                        <span class="fu">list</span>(<span class="st">&quot;mean&quot;</span> <span class="ot">=</span> <span class="dv">0</span>, <span class="st">&quot;sd&quot;</span> <span class="ot">=</span> <span class="dv">1</span>)))</span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>mixt2 <span class="ot">&lt;-</span> <span class="fu">twoComp_mixt</span>(<span class="at">n =</span> <span class="dv">450</span>, <span class="at">weight =</span> <span class="fl">0.7</span>,</span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>                      <span class="at">comp.dist =</span> <span class="fu">list</span>(<span class="st">&quot;norm&quot;</span>, <span class="st">&quot;norm&quot;</span>),</span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a>                      <span class="at">comp.param =</span> <span class="fu">list</span>(<span class="fu">list</span>(<span class="st">&quot;mean&quot;</span> <span class="ot">=</span> <span class="dv">3</span>, <span class="st">&quot;sd&quot;</span> <span class="ot">=</span> <span class="fl">0.5</span>),</span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>                                        <span class="fu">list</span>(<span class="st">&quot;mean&quot;</span> <span class="ot">=</span> <span class="dv">6</span>, <span class="st">&quot;sd&quot;</span> <span class="ot">=</span> <span class="fl">1.2</span>)))</span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a>data1 <span class="ot">&lt;-</span> <span class="fu">getmixtData</span>(mixt1)</span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a>data2 <span class="ot">&lt;-</span> <span class="fu">getmixtData</span>(mixt2)</span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a><span class="do">## Define the admixture models:</span></span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a>admixMod1 <span class="ot">&lt;-</span> <span class="fu">admix_model</span>(<span class="at">knownComp_dist =</span> mixt1<span class="sc">$</span>comp.dist[[<span class="dv">2</span>]],</span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a>                         <span class="at">knownComp_param =</span> mixt1<span class="sc">$</span>comp.param[[<span class="dv">2</span>]])</span>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a>admixMod2 <span class="ot">&lt;-</span> <span class="fu">admix_model</span>(<span class="at">knownComp_dist =</span> mixt2<span class="sc">$</span>comp.dist[[<span class="dv">2</span>]],</span>
+<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a>                         <span class="at">knownComp_param =</span> mixt2<span class="sc">$</span>comp.param[[<span class="dv">2</span>]])</span>
+<span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a><span class="do">## Using expansion coefficients in orthonormal polynomial basis:</span></span>
+<span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a><span class="fu">admix_test</span>(<span class="at">samples =</span> <span class="fu">list</span>(data1,data2), <span class="at">admixMod =</span> <span class="fu">list</span>(admixMod1,admixMod2),</span>
+<span id="cb3-18"><a href="#cb3-18" tabindex="-1"></a>           <span class="at">test_method =</span> <span class="st">&quot;poly&quot;</span>, <span class="at">ask_poly_param =</span> <span class="cn">FALSE</span>, <span class="at">support =</span> <span class="st">&quot;Real&quot;</span>, <span class="at">conf_level =</span> <span class="fl">0.95</span>)</span>
+<span id="cb3-19"><a href="#cb3-19" tabindex="-1"></a><span class="co">#&gt; Call:admix_test(samples = list(data1, data2), admixMod = list(admixMod1, </span></span>
+<span id="cb3-20"><a href="#cb3-20" tabindex="-1"></a><span class="co">#&gt;     admixMod2), test_method = &quot;poly&quot;, ask_poly_param = FALSE, </span></span>
+<span id="cb3-21"><a href="#cb3-21" tabindex="-1"></a><span class="co">#&gt;     support = &quot;Real&quot;, conf_level = 0.95)</span></span>
+<span id="cb3-22"><a href="#cb3-22" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb3-23"><a href="#cb3-23" tabindex="-1"></a><span class="co">#&gt; Do we reject the null hypothesis? No</span></span>
+<span id="cb3-24"><a href="#cb3-24" tabindex="-1"></a><span class="co">#&gt; Here is the associated p-value of the test: 0.498</span></span></code></pre></div>
+<p>The hypothesis test concludes that the null hypothesis cannot be
 rejected, once again in line with what was expected given the specified
 parameters when simulating the data.</p>
-<p>Note that the following arguments of function ‘two_sample_test’ were
-intentionnally set to specific values:</p>
+<p>Note that the following arguments, involved in subroutines, were set
+to default values (but that the user can choose them setting parameter
+‘ask_poly_param’ to TRUE):</p>
 <ul>
-<li>‘method’ equals ‘Poly’ to define the testing strategy based on
-comparisons of expansion coefficients when decomposing the densities in
-the orthonormal polynomial basis,</li>
-<li>‘K’ equals 3 to mention that such expansions are computed up to the
-third order of the decomposition,</li>
 <li>‘est.method’ is set to ‘BVdk’ to tell the program to estimate the
 unknown proportions <span class="math inline">\(p_1\)</span> and <span class="math inline">\(p_2\)</span> using the estimator proposed in <span class="citation">(Bordes and Vandekerkhove 2010)</span>,</li>
-<li>‘nb.ssEch’ equals 2 since there are basically two quantities to
-estimate here (for each sample under study), namely the unknown
-component proportion and the expansion coefficients. This enables to
-create subsamples in order to artificially uncorrelate the
-estimators.</li>
+<li>‘K’ equals 3 to mention that such expansions are computed up to the
+third order of the decomposition in the polynomial basis,</li>
+<li>‘s’ equals 0.25 as the penalization rate involved in the
+penalization rule used in <span class="citation">(Milhaud et al.
+2022)</span>.</li>
 </ul>
 <p>When the unknown component distributions are not supposed to have
-symmetric densities, another solution is to use the IBM method (see
-below).</p>
+symmetric densities, another solution to perform the test is to set
+‘est.method’ to ‘PS’ following ‘ask_poly_param’ set to TRUE, but keeping
+in mind that plugging in such estimators for the test procedure should
+not be allowed in theory. However, that works quite well in practice.
+Another solution to perform this test in full generality is to use the
+IBM method (see below).</p>
 </div>
 <div id="case-of-fully-unknown-densities" class="section level2">
 <h2>Case of fully unknown densities</h2>
 <p>Estimation of the unknown quantities is made by the Inversion - Best
-Matching approach, see <span class="citation">(Milhaud and Vandekerkhove
-2022b)</span>. In this case, one can still use the function
-‘two_sample_test()’ with same arguments except <span class="math inline">\(method=\)</span>’ICV’. The user also has to define
-the number of simulated gaussian processes used to tabulate the test
-statistic distribution (n-sim-tab), and can accelerate computations
-using parallel computations and choosing an adequate number of cpus.
-Other arguments such as <span class="math inline">\(support\)</span> or
-<span class="math inline">\(est-method\)</span> are useless.</p>
+Matching approach, see <span class="citation">(Milhaud et al.
+2024b)</span>. In this case, one can still use the function with same
+first arguments except ‘method’, and ‘method’ should be set to ‘icv’.
+The user also has to define the number of simulated gaussian processes
+used to tabulate the test statistic distribution (‘n_sim_tab’), and can
+accelerate computations using parallel computations and choosing an
+adequate number of cpus. Other arguments such as <span class="math inline">\(support\)</span> are useless.</p>
 </div>
 </div>
 <div id="the-k-sample-case" class="section level1">
 <h1>The K-sample case</h1>
 <p>We introduce hereafter a natural extension of the two-sample case to
-the K-sample one, see <span class="citation">(Milhaud and Vandekerkhove
-2023)</span>. In what follows, the K-sample test is illustrated within
+the K-sample one, see <span class="citation">(Milhaud et al.
+2024a)</span>. In what follows, the K-sample test is illustrated within
 the framework of the IBM approach, i.e. using the associated inner
 convergence property. Of course, in the case when all the unknown
 component densities are assumed to be symmetric, one could use a
@@ -532,7 +540,7 @@ Vandekerkhove 2010)</span>.</p>
 follows <span class="math display">\[L_i(x) = p_i F_i(x) + (1-p_i) G_i,
 \qquad x \in \mathbb{R}.\]</span> The test to perform is given by <span class="math display">\[H_0 : \; F_1 = ... = F_K \qquad \mbox{against}
 \qquad H_1: \; F_i \neq F_j \quad \mbox{for some} \quad i \neq
-j.\]</span> We use IBM approach to do so, where assumptions are
+j.\]</span> We use the IBM approach to do so, where assumptions are
 (straightforwardly) adapted to deal with the <span class="math inline">\(K\)</span> samples.</p>
 <p>Basically, we apply the theoretical results of IBM for each pair of
 populations <span class="math inline">\((i,j)\)</span>, and then build a
@@ -572,70 +580,74 @@ consider the <span class="math inline">\(H_0\)</span>-rejection rule:
 <span class="math display">\[\tilde{U}_n \quad \geq \quad \hat
 q_{1-\alpha} \qquad \Rightarrow \qquad H_0 \; \mbox{is
 rejected}.\]</span></p>
-<p>We now provide the way to perform this test with the package admix
-with gaussian mixture models. First, let us study the case where we are
-under the null hypothesis <span class="math inline">\(H_0\)</span>,
-considering <span class="math inline">\(K=3\)</span> different
-populations.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="do">## Simulate data under the null H0:</span></span>
-<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>list.comp <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">f1 =</span> <span class="st">&#39;norm&#39;</span>, <span class="at">g1 =</span> <span class="st">&#39;norm&#39;</span>,</span>
-<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>                  <span class="at">f2 =</span> <span class="st">&#39;norm&#39;</span>, <span class="at">g2 =</span> <span class="st">&#39;norm&#39;</span>,</span>
-<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>                  <span class="at">f3 =</span> <span class="st">&#39;norm&#39;</span>, <span class="at">g3 =</span> <span class="st">&#39;norm&#39;</span>)</span>
-<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>list.param <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">f1 =</span> <span class="fu">list</span>(<span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> <span class="dv">1</span>), <span class="at">g1 =</span> <span class="fu">list</span>(<span class="at">mean =</span> <span class="dv">2</span>, <span class="at">sd =</span> <span class="fl">0.7</span>),</span>
-<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>                   <span class="at">f2 =</span> <span class="fu">list</span>(<span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> <span class="dv">1</span>), <span class="at">g2 =</span> <span class="fu">list</span>(<span class="at">mean =</span> <span class="dv">4</span>, <span class="at">sd =</span> <span class="fl">1.1</span>),</span>
-<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>                   <span class="at">f3 =</span> <span class="fu">list</span>(<span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> <span class="dv">1</span>), <span class="at">g3 =</span> <span class="fu">list</span>(<span class="at">mean =</span> <span class="dv">3</span>, <span class="at">sd =</span> <span class="fl">0.8</span>))</span>
-<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a>sim1 <span class="ot">&lt;-</span> <span class="fu">rsimmix</span>(<span class="at">n =</span> <span class="dv">1500</span>, <span class="at">unknownComp_weight =</span> <span class="fl">0.8</span>, <span class="at">comp.dist =</span> <span class="fu">list</span>(list.comp<span class="sc">$</span>f1,list.comp<span class="sc">$</span>g1),</span>
-<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a>                <span class="at">comp.param =</span> <span class="fu">list</span>(list.param<span class="sc">$</span>f1, list.param<span class="sc">$</span>g1))<span class="sc">$</span>mixt.data</span>
-<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a>sim2 <span class="ot">&lt;-</span> <span class="fu">rsimmix</span>(<span class="at">n =</span> <span class="dv">1700</span>, <span class="at">unknownComp_weight =</span> <span class="fl">0.7</span>, <span class="at">comp.dist =</span> <span class="fu">list</span>(list.comp<span class="sc">$</span>f2,list.comp<span class="sc">$</span>g2),</span>
-<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a>                <span class="at">comp.param =</span> <span class="fu">list</span>(list.param<span class="sc">$</span>f2, list.param<span class="sc">$</span>g2))<span class="sc">$</span>mixt.data</span>
-<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a>sim3 <span class="ot">&lt;-</span> <span class="fu">rsimmix</span>(<span class="at">n =</span> <span class="dv">2000</span>, <span class="at">unknownComp_weight =</span> <span class="fl">0.6</span>, <span class="at">comp.dist =</span> <span class="fu">list</span>(list.comp<span class="sc">$</span>f3,list.comp<span class="sc">$</span>g3),</span>
-<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a>                <span class="at">comp.param =</span> <span class="fu">list</span>(list.param<span class="sc">$</span>f3, list.param<span class="sc">$</span>g3))<span class="sc">$</span>mixt.data</span>
-<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a><span class="do">## Perform the 3-samples test in a real-life setting:</span></span>
-<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a>list.comp <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">f1 =</span> <span class="cn">NULL</span>, <span class="at">g1 =</span> <span class="st">&#39;norm&#39;</span>,</span>
-<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a>                  <span class="at">f2 =</span> <span class="cn">NULL</span>, <span class="at">g2 =</span> <span class="st">&#39;norm&#39;</span>,</span>
-<span id="cb5-17"><a href="#cb5-17" tabindex="-1"></a>                  <span class="at">f3 =</span> <span class="cn">NULL</span>, <span class="at">g3 =</span> <span class="st">&#39;norm&#39;</span>)</span>
-<span id="cb5-18"><a href="#cb5-18" tabindex="-1"></a>list.param <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">f1 =</span> <span class="cn">NULL</span>, <span class="at">g1 =</span> <span class="fu">list</span>(<span class="at">mean =</span> <span class="dv">2</span>, <span class="at">sd =</span> <span class="fl">0.7</span>),</span>
-<span id="cb5-19"><a href="#cb5-19" tabindex="-1"></a>                   <span class="at">f2 =</span> <span class="cn">NULL</span>, <span class="at">g2 =</span> <span class="fu">list</span>(<span class="at">mean =</span> <span class="dv">4</span>, <span class="at">sd =</span> <span class="fl">1.1</span>),</span>
-<span id="cb5-20"><a href="#cb5-20" tabindex="-1"></a>                   <span class="at">f3 =</span> <span class="cn">NULL</span>, <span class="at">g3 =</span> <span class="fu">list</span>(<span class="at">mean =</span> <span class="dv">3</span>, <span class="at">sd =</span> <span class="fl">0.8</span>))</span>
-<span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a>obj <span class="ot">&lt;-</span> <span class="fu">IBM_k_samples_test</span>(<span class="at">samples =</span> <span class="fu">list</span>(sim1,sim2,sim3), <span class="at">sim_U =</span> <span class="cn">NULL</span>, <span class="at">n_sim_tab =</span> <span class="dv">8</span>,</span>
-<span id="cb5-22"><a href="#cb5-22" tabindex="-1"></a>                          <span class="at">comp.dist =</span> list.comp, <span class="at">comp.param =</span> list.param, <span class="at">tune.penalty =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb5-23"><a href="#cb5-23" tabindex="-1"></a>                          <span class="at">parallel =</span> <span class="cn">FALSE</span>, <span class="at">n_cpu =</span> <span class="dv">2</span>)</span>
-<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a>obj<span class="sc">$</span>rejection_rule</span>
-<span id="cb5-25"><a href="#cb5-25" tabindex="-1"></a><span class="co">#&gt;   95% </span></span>
-<span id="cb5-26"><a href="#cb5-26" tabindex="-1"></a><span class="co">#&gt; FALSE</span></span></code></pre></div>
+<p>We now provide the way to perform this test with the package <span class="math inline">\(admix\)</span> with Gaussian mixtures. First, let
+us study the case where we are under the null hypothesis <span class="math inline">\(H_0\)</span>, considering <span class="math inline">\(K=3\)</span> different populations.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>mixt1 <span class="ot">&lt;-</span> <span class="fu">twoComp_mixt</span>(<span class="at">n =</span> <span class="dv">450</span>, <span class="at">weight =</span> <span class="fl">0.4</span>,</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>                      <span class="at">comp.dist =</span> <span class="fu">list</span>(<span class="st">&quot;norm&quot;</span>, <span class="st">&quot;norm&quot;</span>),</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>                      <span class="at">comp.param =</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">&quot;mean&quot;</span> <span class="ot">=</span> <span class="sc">-</span><span class="dv">2</span>, <span class="st">&quot;sd&quot;</span> <span class="ot">=</span> <span class="fl">0.5</span>),</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>                                        <span class="fu">c</span>(<span class="st">&quot;mean&quot;</span> <span class="ot">=</span> <span class="dv">0</span>, <span class="st">&quot;sd&quot;</span> <span class="ot">=</span> <span class="dv">1</span>)))</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>mixt2 <span class="ot">&lt;-</span> <span class="fu">twoComp_mixt</span>(<span class="at">n =</span> <span class="dv">600</span>, <span class="at">weight =</span> <span class="fl">0.24</span>,</span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>                      <span class="at">comp.dist =</span> <span class="fu">list</span>(<span class="st">&quot;norm&quot;</span>, <span class="st">&quot;norm&quot;</span>),</span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>                      <span class="at">comp.param =</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">&quot;mean&quot;</span> <span class="ot">=</span> <span class="sc">-</span><span class="dv">2</span>, <span class="st">&quot;sd&quot;</span> <span class="ot">=</span> <span class="fl">0.5</span>),</span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>                                        <span class="fu">c</span>(<span class="st">&quot;mean&quot;</span> <span class="ot">=</span> <span class="sc">-</span><span class="dv">1</span>, <span class="st">&quot;sd&quot;</span> <span class="ot">=</span> <span class="dv">1</span>)))</span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a>mixt3 <span class="ot">&lt;-</span> <span class="fu">twoComp_mixt</span>(<span class="at">n =</span> <span class="dv">400</span>, <span class="at">weight =</span> <span class="fl">0.53</span>,</span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a>                      <span class="at">comp.dist =</span> <span class="fu">list</span>(<span class="st">&quot;norm&quot;</span>, <span class="st">&quot;norm&quot;</span>),</span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a>                      <span class="at">comp.param =</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">&quot;mean&quot;</span> <span class="ot">=</span> <span class="sc">-</span><span class="dv">2</span>, <span class="st">&quot;sd&quot;</span> <span class="ot">=</span> <span class="fl">0.5</span>),</span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a>                                        <span class="fu">c</span>(<span class="st">&quot;mean&quot;</span> <span class="ot">=</span> <span class="dv">2</span>, <span class="st">&quot;sd&quot;</span> <span class="ot">=</span> <span class="dv">1</span>)))</span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a>data1 <span class="ot">&lt;-</span> <span class="fu">getmixtData</span>(mixt1)</span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a>data2 <span class="ot">&lt;-</span> <span class="fu">getmixtData</span>(mixt2)</span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a>data3 <span class="ot">&lt;-</span> <span class="fu">getmixtData</span>(mixt3)</span>
+<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a>admixMod1 <span class="ot">&lt;-</span> <span class="fu">admix_model</span>(<span class="at">knownComp_dist =</span> mixt1<span class="sc">$</span>comp.dist[[<span class="dv">2</span>]],</span>
+<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a>                         <span class="at">knownComp_param =</span> mixt1<span class="sc">$</span>comp.param[[<span class="dv">2</span>]])</span>
+<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a>admixMod2 <span class="ot">&lt;-</span> <span class="fu">admix_model</span>(<span class="at">knownComp_dist =</span> mixt2<span class="sc">$</span>comp.dist[[<span class="dv">2</span>]],</span>
+<span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a>                         <span class="at">knownComp_param =</span> mixt2<span class="sc">$</span>comp.param[[<span class="dv">2</span>]])</span>
+<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a>admixMod3 <span class="ot">&lt;-</span> <span class="fu">admix_model</span>(<span class="at">knownComp_dist =</span> mixt3<span class="sc">$</span>comp.dist[[<span class="dv">2</span>]],</span>
+<span id="cb4-21"><a href="#cb4-21" tabindex="-1"></a>                         <span class="at">knownComp_param =</span> mixt3<span class="sc">$</span>comp.param[[<span class="dv">2</span>]])</span>
+<span id="cb4-22"><a href="#cb4-22" tabindex="-1"></a><span class="fu">admix_test</span>(<span class="at">samples =</span> <span class="fu">list</span>(data1, data2, data3),</span>
+<span id="cb4-23"><a href="#cb4-23" tabindex="-1"></a>           <span class="at">admixMod =</span> <span class="fu">list</span>(admixMod1, admixMod2, admixMod3),</span>
+<span id="cb4-24"><a href="#cb4-24" tabindex="-1"></a>           <span class="at">test_method =</span> <span class="st">&quot;icv&quot;</span>, <span class="at">n_sim_tab =</span> <span class="dv">8</span>, <span class="at">ICV_tunePenalty =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb4-25"><a href="#cb4-25" tabindex="-1"></a>           <span class="at">conf_level =</span> <span class="fl">0.95</span>, <span class="at">parallel =</span> <span class="cn">FALSE</span>, <span class="at">n_cpu =</span> <span class="dv">2</span>)</span>
+<span id="cb4-26"><a href="#cb4-26" tabindex="-1"></a><span class="co">#&gt; Call:admix_test(samples = list(data1, data2, data3), admixMod = list(admixMod1, </span></span>
+<span id="cb4-27"><a href="#cb4-27" tabindex="-1"></a><span class="co">#&gt;     admixMod2, admixMod3), test_method = &quot;icv&quot;, n_sim_tab = 8, </span></span>
+<span id="cb4-28"><a href="#cb4-28" tabindex="-1"></a><span class="co">#&gt;     ICV_tunePenalty = FALSE, conf_level = 0.95, parallel = FALSE, </span></span>
+<span id="cb4-29"><a href="#cb4-29" tabindex="-1"></a><span class="co">#&gt;     n_cpu = 2)</span></span>
+<span id="cb4-30"><a href="#cb4-30" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb4-31"><a href="#cb4-31" tabindex="-1"></a><span class="co">#&gt; Do we reject the null hypothesis? No</span></span>
+<span id="cb4-32"><a href="#cb4-32" tabindex="-1"></a><span class="co">#&gt; Here is the associated p-value of the test: 0.75</span></span></code></pre></div>
 </div>
 <div id="references" class="section level1 unnumbered">
 <h1 class="unnumbered">References</h1>
 <div id="refs" class="references csl-bib-body hanging-indent">
-<div id="ref-BV10" class="csl-entry">
+<div id="ref-BordesVandekerkhove2010" class="csl-entry">
 Bordes, L., and P. Vandekerkhove. 2010. <span>“Semiparametric
-Two-Component Mixture Model When a Component Is Known: An Asymptotically
-Normal Estimator.”</span> <em>Mathematical Methods of Statistics</em>
-19: 22–41.
+Two-Component Mixture Model with a Known Component: An Asymptotically
+Normal Estimator.”</span> <em>Mathematical Methods of Statistics</em> 19
+(1): 22–41. https://doi.org/<a href="https://doi.org/10.3103/S1066530710010023">https://doi.org/10.3103/S1066530710010023</a>.
 </div>
-<div id="ref-MPSV21" class="csl-entry">
-Milhaud, Pommeret, X., and P. Vandekerkhove. 2022a.
-<span>“Semiparametric Two-Sample Admixture Components Comparison Test:
-The Symmetric Case.”</span> <em>Journal of Statistical Planning and
-Inference</em> 216: 135–50.
+<div id="ref-MilhaudPommeretSalhiVandekerkhove2022" class="csl-entry">
+Milhaud, Xavier, Denys Pommeret, Yahia Salhi, and Pierre Vandekerkhove.
+2022. <span>“Semiparametric Two-Sample Admixture Components Comparison
+Test: The Symmetric Case.”</span> <em>Journal of Statistical Planning
+and Inference</em> 216: 135–50. https://doi.org/<a href="https://doi.org/10.1016/j.jspi.2021.05.010">https://doi.org/10.1016/j.jspi.2021.05.010</a>.
 </div>
-<div id="ref-MilhaudIBM21" class="csl-entry">
-———. 2022b. <span>“Shape Constraint Free Two-Sample Contamination Model
-Testing.”</span> <a href="https://hal.science/hal-03201760">https://hal.science/hal-03201760</a>.
+<div id="ref-MilhaudPommeretSalhiVandekerkhove2024b" class="csl-entry">
+———. 2024a. <span>“Contamination-Source Based k-Sample
+Clustering.”</span> <em>Journal of Machine Learning Research</em> 25
+(287): 1–32. <a href="https://jmlr.org/papers/v25/23-0914.html">https://jmlr.org/papers/v25/23-0914.html</a>.
 </div>
-<div id="ref-MilhaudCluster23" class="csl-entry">
-———. 2023. <span>“Contamination-Source Based k-Sample
-Clustering.”</span> <a href="https://hal.science/hal-04129130">https://hal.science/hal-04129130</a>.
+<div id="ref-MilhaudPommeretSalhiVandekerkhove2024a" class="csl-entry">
+———. 2024b. <span>“<span class="nocase">Two-sample contamination model
+test</span>.”</span> <em>Bernoulli</em> 30 (1): 170–97. <a href="https://doi.org/10.3150/23-BEJ1593">https://doi.org/10.3150/23-BEJ1593</a>.
 </div>
-<div id="ref-Patra" class="csl-entry">
-Patra, R. K., and B. Sen. 2016. <span>“Estimation of a Two-Component
-Mixture Model with Applications to Multiple Testing.”</span> <em>Journal
-of the Royal Statistical Society, Series B</em> 78: 869–93.
+<div id="ref-PatraSen2016" class="csl-entry">
+Patra, Rohit Kumar, and Bodhisattva Sen. 2016. <span>“<span class="nocase">Estimation of a two-component mixture model with
+applications to multiple testing</span>.”</span> <em>Journal of the
+Royal Statistical Society Series B</em> 78 (4): 869–93.
 </div>
-<div id="ref-PVdk19" class="csl-entry">
-Pommeret, D., and P. Vandekerkhove. 2019. <span>“Semiparametric Density
-Testing in the Contamination Model.”</span> <em>Electronic Journal of
-Statistics</em> 13: 4743–93.
+<div id="ref-PommeretVandekerkhove2019" class="csl-entry">
+Pommeret, Denys, and Pierre Vandekerkhove. 2019. <span>“Semiparametric
+Density Testing in the Contamination Model.”</span> <em>Electronic
+Journal of Statistics</em>, no. 13: 4743–93. https://doi.org/<a href="https://doi.org/10.1214/19-EJS1650">https://doi.org/10.1214/19-EJS1650</a>.
 </div>
 <div id="ref-Schwarz_1978" class="csl-entry">
 Schwarz, G. 1978. <span>“Estimating the Dimension of a Model.”</span>

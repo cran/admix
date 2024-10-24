@@ -2,56 +2,51 @@
 % Please edit documentation in R/BVdk_varCov_estimators.R
 \name{BVdk_varCov_estimators}
 \alias{BVdk_varCov_estimators}
-\title{Estimation of the variance of the estimators in admixture models with symmetric unknown density.}
+\title{Variance of estimators in an admixture model with symmetric unknown density.}
 \usage{
-BVdk_varCov_estimators(data, loc, p, comp.dist, comp.param)
+BVdk_varCov_estimators(estim, data, admixMod)
 }
 \arguments{
+\item{estim}{An object of class 'estim_BVdk', containing the estimators of unknown quantities in the admixture model.}
+
 \item{data}{The observed sample under study.}
 
-\item{loc}{The estimated location shift parameter, related to the unknown symmetric density.}
-
-\item{p}{The estimated unknown component weight.}
-
-\item{comp.dist}{A list with two elements corresponding to component distributions (specified with R native names for these distributions) involved
-in the admixture model. Unknown elements must be specified as 'NULL' objects, e.g. when 'f' is unknown: list(f=NULL, g='norm').}
-
-\item{comp.param}{A list with two elements corresponding to the parameters of the component distributions, each element being a list
-itself. The names used in this list must correspond to the native R argument names for these distributions.
-Unknown elements must be specified as 'NULL' objects, e.g. if 'f' is unknown: list(f=NULL, g=list(mean=0,sd=1)).}
+\item{admixMod}{An object of class 'admix_model', containing useful information about distributions and parameters.}
 }
 \value{
 A list containing 1) the variance-covariance matrix of the estimators (assessed at the specific time points 'u' and 'v'
-such that u=v=mean(data)); 2) the variance of the mixture weight estimator; 3) the variance
-of the location shift estimator; 4) the variance of the unknown component cumulative distribution
-function at points 'u' and 'v' (useless for most of applications, explaining why 'u' and 'v'
-are set equal to mean(data) by default, with no corresponding arguments here).
+such that u = v = mean(data)); 2) the variance of the estimator of the unknown mixture weight; 3) the variance of the
+estimator of the location shift parameter; 4) the variance of the estimator of the unknown component cumulative
+distribution function at points 'u' and 'v'.
 }
 \description{
-Semiparametric estimation of the variance of the estimators, i.e. the mixture weight p and the location shift parameter mu
+Semiparametric estimation of the variance of the estimators related to the mixture weight p and the location shift parameter mu,
 considering the admixture model with probability density function l:
 l(x) = p*f(x-mu) + (1-p)*g(x), x in R,
 where g is the known component of the two-component mixture, p is the unknown proportion, f is the unknown component density and
 mu is the location shift. See 'Details' below for more information.
 }
 \details{
-See formulas pp.28--30 in Appendix of Bordes, L. and Vandekerkhove, P. (2010); Semiparametric two-component mixture
-model when a component is known: an asymptotically normal estimator; Math. Meth. Stat.; 19, pp. 22--41.
+See formulas pp.28--30 in Appendix of Bordes, L. and Vandekerkhove, P. (2010).
 }
 \examples{
-## Simulate data:
-list.comp <- list(f = 'norm', g = 'norm')
-list.param <- list(f = c(mean = 4, sd = 1), g = c(mean = 7, sd = 0.5))
-sim.data <- rsimmix(n=140, unknownComp_weight=0.9, comp.dist=list.comp, comp.param=list.param)
-## Estimate the location shift and mixture weight parameters in real-life setting:
-list.comp <- list(f = NULL, g = 'norm')
-list.param <- list(f = NULL, g = c(mean = 7, sd = 0.5))
-estimators <- BVdk_estimParam(data = sim.data[['mixt.data']], method = "L-BFGS-B",
-                              comp.dist = list.comp, comp.param = list.param)
-## Estimate the variance of the two estimators (first mixture weight, then location shift):
-BVdk_varCov_estimators(data = sim.data[['mixt.data']], loc = estimators[2], p = estimators[1],
-                       comp.dist = list.comp, comp.param = list.param)
+## Simulate mixture data:
+mixt1 <- twoComp_mixt(n = 200, weight = 0.4,
+                      comp.dist = list("norm", "norm"),
+                      comp.param = list(c("mean" = -2, "sd" = 0.5),
+                                        c("mean" = 0, "sd" = 1)))
+data1 <- getmixtData(mixt1)
+## Define the admixture model:
+admixMod <- admix_model(knownComp_dist = mixt1$comp.dist[[2]],
+                        knownComp_param = mixt1$comp.param[[2]])
 
+## Perform the estimation of parameters in real-life:
+estim <- estim_BVdk(data = data1, admixMod = admixMod, method = 'L-BFGS-B')
+BVdk_varCov_estimators(estim = estim, data = data1, admixMod = admixMod)
+
+}
+\references{
+\insertRef{BordesVandekerkhove2010}{admix}
 }
 \author{
 Xavier Milhaud \href{mailto:xavier.milhaud.research@gmail.com}{xavier.milhaud.research@gmail.com}
