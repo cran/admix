@@ -6,11 +6,11 @@
 #' where g is the known component of the two-component mixture, p is the unknown proportion of the unknown component distribution f.
 #' More information in 'Details' below concerning the estimation method.
 #'
-#' @param data Sample to be studied.
+#' @param samples Sample to be studied.
 #' @param admixMod An object of class 'admix_model', containing information about the known component distribution and its parameter(s).
 #' @param method One of 'lwr.bnd', fixed' or 'cv': depending on whether compute some lower bound of the mixing proportion, the estimate
 #'               based on the value of 'c.n' or use cross-validation for choosing 'c.n' (tuning parameter).
-#' @param c.n A positive number, with default value equal to 0.1 log(log(n)), where 'n' is the length of the observed sample.
+#' @param c.n (default to NULL) A positive number for the penalization, see reference below. If NULL, equals to 0.1*log(log(n)).
 #' @param folds (optional, default to 10) Number of folds used for cross-validation.
 #' @param reps (optional, default to 1) Number of replications for cross-validation.
 #' @param cn.s (optional) A sequence of 'c.n' to be used for cross-validation (vector of values). Default is equally
@@ -31,34 +31,33 @@
 #'
 #' @examples
 #' ## Simulate mixture data:
-#' mixt1 <- twoComp_mixt(n = 800, weight = 0.2,
-#'                       comp.dist = list("norm", "norm"),
-#'                       comp.param = list(list("mean" = 3, "sd" = 0.5),
-#'                                         list("mean" = 0, "sd" = 1)))
+#' mixt1 <- twoComp_mixt(n = 800, weight = 0.33,
+#'                       comp.dist = list("gamma", "exp"),
+#'                       comp.param = list(list("shape" = 2, "scale" = 0.5),
+#'                                         list("rate" = 0.25)))
 #' data1 <- getmixtData(mixt1)
-#'
 #' ## Define the admixture model:
 #' admixMod1 <- admix_model(knownComp_dist = mixt1$comp.dist[[2]],
 #'                          knownComp_param = mixt1$comp.param[[2]])
-#'
 #' ## Transform the known component of the admixture model into a Uniform(O,1) distribution:
-#' estim_PS(data = data1, admixMod = admixMod1, method = 'fixed',
-#'          c.n = 0.1*log(log(length(data1))), gridsize = 1000)
+#' estim_PS(samples = data1, admixMod = admixMod1, method = 'fixed', c.n = NULL)
+#'
 #'
 #' @author Xavier Milhaud <xavier.milhaud.research@gmail.com>
 #' @export
 
-estim_PS <- function(data, admixMod, method = c("lwr.bnd", "fixed", "cv"), c.n = NULL,
-                             folds = 10, reps = 1, cn.s = NULL, cn.length = 100, gridsize = 600)
+estim_PS <- function(samples, admixMod, method = c("fixed", "lwr.bnd", "cv"), c.n = NULL,
+                             folds = 10, reps = 1, cn.s = NULL, cn.length = 100, gridsize = 1200)
 {
-	if (!is.vector(data)) stop("'data' has to be a numerical vector.")
+	if (!is.vector(samples)) stop("'samples' has to be a numerical vector.")
 	if (is.null(method)) stop("'method' cannot be NULL")
-  n <- length(data)
+  n <- length(samples)
   ## Transform the known component distribution into a Uniform distribution:
-  data <- knownComp_to_uniform(data, admixMod)
+  samples <- knownComp_to_uniform(samples, admixMod)
 
+  method <- match.arg(method)
 	if (method == 'lwr.bnd') {
-		dist.out <- PS_dist_calc(data, gridsize = gridsize)
+		dist.out <- PS_dist_calc(samples, gridsize = gridsize)
 		q <- 0.6792
 		alp.Lwr <- sum(dist.out$distance > q/ sqrt(n)) / gridsize
 		alp.hat <- NULL
@@ -70,10 +69,10 @@ estim_PS <- function(data, admixMod, method = c("lwr.bnd", "fixed", "cv"), c.n =
 
 	if (method == "fixed"){
 		if (is.null(c.n)) {
-			warning("'c.n' is not given. Fixing it to be '0.1*log(log(n))")
+			warning("\n'c.n' is not given. Fixing it to be '0.1*log(log(n))\n")
 			c.n <- 0.1 *log(log(n))
 		}
-		dist.out <- PS_dist_calc(data, gridsize = gridsize)
+		dist.out <- PS_dist_calc(samples, gridsize = gridsize)
 		alp.hat <- sum(dist.out$distance > c.n/ sqrt(n)) / gridsize
 		if (alp.hat > 0) {
 			F.hat <- (dist.out$F.n - (1-alp.hat)*dist.out$F.b) / alp.hat    # computes the naive estimator of F_s
@@ -88,7 +87,7 @@ estim_PS <- function(data, admixMod, method = c("lwr.bnd", "fixed", "cv"), c.n =
 		Fs.hat.fun$x <-  dist.out$F.n.x
 
 	} else if (method == "cv") {
-		out.cv <- estimCV_PS(data, admixMod, folds = folds, reps = reps,
+		out.cv <- estimCV_PS(samples, admixMod, folds = folds, reps = reps,
 		                     cn.s = cn.s, cn.length = cn.length, gridsize = gridsize)
 		alp.hat <- out.cv$alp.hat
 		Fs.hat.fun <- out.cv$Fs.hat
@@ -98,7 +97,7 @@ estim_PS <- function(data, admixMod, method = c("lwr.bnd", "fixed", "cv"), c.n =
 
 	ret <- list(
 	  n_populations = 1,
-	  population_sizes = length(data),
+	  population_sizes = length(samples),
 	  admixture_models = admixMod,
 	  estimation_method = "Patra and Sen",
 	  estimated_mixing_weights = alp.hat,
@@ -132,8 +131,8 @@ print.estim_PS <- function(x, ...){
   cat("Call:")
   print(x$call)
   if(x$method != "lwr.bnd"){
-    cat("\n", paste("Estimate of the mixing weight (proportion of the unknown component distribution) is" , x$estimated_mixing_weights))
-    cat("\n", paste("The chosen value c_n is", x$c.n))
+    cat("\n", paste("Estimate of the mixing weight (proportion of the unknown component distribution) is" , round(x$estimated_mixing_weights,2)))
+    cat("\n", paste("The chosen value c_n is", round(x$c.n, 3)), "\n")
     if( !is.null(x$cv.out)){
       old_par <- graphics::par()$mfrow
       graphics::par(mfrow=c(1,2))

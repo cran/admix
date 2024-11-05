@@ -427,15 +427,14 @@ an example of hypothesis testing in this 1-sample case:</p>
 <span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="do">## Define the admixture model:</span></span>
 <span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>admixMod <span class="ot">&lt;-</span> <span class="fu">admix_model</span>(<span class="at">knownComp_dist =</span> mixt1<span class="sc">$</span>comp.dist[[<span class="dv">2</span>]],</span>
 <span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>                        <span class="at">knownComp_param =</span> mixt1<span class="sc">$</span>comp.param[[<span class="dv">2</span>]])</span>
-<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="fu">admix_test</span>(<span class="at">samples =</span> <span class="fu">list</span>(data1), <span class="at">admixMod =</span> <span class="fu">list</span>(admixMod),</span>
-<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a>           <span class="at">test_method =</span> <span class="st">&quot;poly&quot;</span>, <span class="at">ask_poly_param =</span> <span class="cn">FALSE</span>, <span class="at">support =</span> <span class="st">&quot;Real&quot;</span>,</span>
-<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a>           <span class="at">conf_level =</span> <span class="fl">0.95</span>, <span class="at">parallel =</span> <span class="cn">FALSE</span>, <span class="at">n_cpu =</span> <span class="dv">2</span>)</span>
-<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a><span class="co">#&gt; Call:admix_test(samples = list(data1), admixMod = list(admixMod), </span></span>
-<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a><span class="co">#&gt;     test_method = &quot;poly&quot;, ask_poly_param = FALSE, support = &quot;Real&quot;, </span></span>
-<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a><span class="co">#&gt;     conf_level = 0.95, parallel = FALSE, n_cpu = 2)</span></span>
-<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a><span class="co">#&gt; Do we reject the null hypothesis? No</span></span>
-<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a><span class="co">#&gt; Here is the associated p-value of the test: 0.789</span></span></code></pre></div>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="fu">admix_test</span>(<span class="at">samples =</span> <span class="fu">list</span>(data1), <span class="at">admixMod =</span> <span class="fu">list</span>(admixMod), <span class="at">conf_level =</span> <span class="fl">0.95</span>,</span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a>           <span class="at">test_method =</span> <span class="st">&quot;poly&quot;</span>, <span class="at">ask_poly_param =</span> <span class="cn">FALSE</span>, <span class="at">support =</span> <span class="st">&quot;Real&quot;</span>)</span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a><span class="co">#&gt; Call:admix_test(samples = list(data1), admixMod = list(admixMod), </span></span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a><span class="co">#&gt;     test_method = &quot;poly&quot;, conf_level = 0.95, ask_poly_param = FALSE, </span></span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a><span class="co">#&gt;     support = &quot;Real&quot;)</span></span>
+<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a><span class="co">#&gt; Do we reject the null hypothesis? No</span></span>
+<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a><span class="co">#&gt; Here is the associated p-value of the test: 0.938</span></span></code></pre></div>
 <p>The result of the test is that we cannot reject the null hypothesis
 <span class="math inline">\(H_0\)</span>, which is in line with the
 specified distribution for the unknown component. Indeed, simulated data
@@ -465,14 +464,14 @@ closely connected to <span class="citation">(Pommeret and Vandekerkhove
 duplicated on each of the two samples under study.</p>
 <p>In what follows, we simulate two samples under the null and check
 whether the test provides satisfactory results.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>mixt1 <span class="ot">&lt;-</span> <span class="fu">twoComp_mixt</span>(<span class="at">n =</span> <span class="dv">350</span>, <span class="at">weight =</span> <span class="fl">0.8</span>,</span>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>mixt1 <span class="ot">&lt;-</span> <span class="fu">twoComp_mixt</span>(<span class="at">n =</span> <span class="dv">600</span>, <span class="at">weight =</span> <span class="fl">0.8</span>,</span>
 <span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>                      <span class="at">comp.dist =</span> <span class="fu">list</span>(<span class="st">&quot;norm&quot;</span>, <span class="st">&quot;norm&quot;</span>),</span>
 <span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>                      <span class="at">comp.param =</span> <span class="fu">list</span>(<span class="fu">list</span>(<span class="st">&quot;mean&quot;</span> <span class="ot">=</span> <span class="dv">3</span>, <span class="st">&quot;sd&quot;</span> <span class="ot">=</span> <span class="fl">0.5</span>),</span>
 <span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>                                        <span class="fu">list</span>(<span class="st">&quot;mean&quot;</span> <span class="ot">=</span> <span class="dv">0</span>, <span class="st">&quot;sd&quot;</span> <span class="ot">=</span> <span class="dv">1</span>)))</span>
-<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>mixt2 <span class="ot">&lt;-</span> <span class="fu">twoComp_mixt</span>(<span class="at">n =</span> <span class="dv">450</span>, <span class="at">weight =</span> <span class="fl">0.7</span>,</span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>mixt2 <span class="ot">&lt;-</span> <span class="fu">twoComp_mixt</span>(<span class="at">n =</span> <span class="dv">800</span>, <span class="at">weight =</span> <span class="fl">0.7</span>,</span>
 <span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>                      <span class="at">comp.dist =</span> <span class="fu">list</span>(<span class="st">&quot;norm&quot;</span>, <span class="st">&quot;norm&quot;</span>),</span>
 <span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a>                      <span class="at">comp.param =</span> <span class="fu">list</span>(<span class="fu">list</span>(<span class="st">&quot;mean&quot;</span> <span class="ot">=</span> <span class="dv">3</span>, <span class="st">&quot;sd&quot;</span> <span class="ot">=</span> <span class="fl">0.5</span>),</span>
-<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>                                        <span class="fu">list</span>(<span class="st">&quot;mean&quot;</span> <span class="ot">=</span> <span class="dv">6</span>, <span class="st">&quot;sd&quot;</span> <span class="ot">=</span> <span class="fl">1.2</span>)))</span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>                                        <span class="fu">list</span>(<span class="st">&quot;mean&quot;</span> <span class="ot">=</span> <span class="dv">0</span>, <span class="st">&quot;sd&quot;</span> <span class="ot">=</span> <span class="dv">1</span>)))</span>
 <span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a>data1 <span class="ot">&lt;-</span> <span class="fu">getmixtData</span>(mixt1)</span>
 <span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a>data2 <span class="ot">&lt;-</span> <span class="fu">getmixtData</span>(mixt2)</span>
 <span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a><span class="do">## Define the admixture models:</span></span>
@@ -481,14 +480,14 @@ whether the test provides satisfactory results.</p>
 <span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a>admixMod2 <span class="ot">&lt;-</span> <span class="fu">admix_model</span>(<span class="at">knownComp_dist =</span> mixt2<span class="sc">$</span>comp.dist[[<span class="dv">2</span>]],</span>
 <span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a>                         <span class="at">knownComp_param =</span> mixt2<span class="sc">$</span>comp.param[[<span class="dv">2</span>]])</span>
 <span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a><span class="do">## Using expansion coefficients in orthonormal polynomial basis:</span></span>
-<span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a><span class="fu">admix_test</span>(<span class="at">samples =</span> <span class="fu">list</span>(data1,data2), <span class="at">admixMod =</span> <span class="fu">list</span>(admixMod1,admixMod2),</span>
-<span id="cb3-18"><a href="#cb3-18" tabindex="-1"></a>           <span class="at">test_method =</span> <span class="st">&quot;poly&quot;</span>, <span class="at">ask_poly_param =</span> <span class="cn">FALSE</span>, <span class="at">support =</span> <span class="st">&quot;Real&quot;</span>, <span class="at">conf_level =</span> <span class="fl">0.95</span>)</span>
+<span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a><span class="fu">admix_test</span>(<span class="at">samples =</span> <span class="fu">list</span>(data1,data2), <span class="at">admixMod =</span> <span class="fu">list</span>(admixMod1,admixMod2), <span class="at">conf_level =</span> <span class="fl">0.95</span>,</span>
+<span id="cb3-18"><a href="#cb3-18" tabindex="-1"></a>           <span class="at">test_method =</span> <span class="st">&quot;poly&quot;</span>, <span class="at">ask_poly_param =</span> <span class="cn">FALSE</span>, <span class="at">support =</span> <span class="st">&quot;Real&quot;</span>)</span>
 <span id="cb3-19"><a href="#cb3-19" tabindex="-1"></a><span class="co">#&gt; Call:admix_test(samples = list(data1, data2), admixMod = list(admixMod1, </span></span>
-<span id="cb3-20"><a href="#cb3-20" tabindex="-1"></a><span class="co">#&gt;     admixMod2), test_method = &quot;poly&quot;, ask_poly_param = FALSE, </span></span>
-<span id="cb3-21"><a href="#cb3-21" tabindex="-1"></a><span class="co">#&gt;     support = &quot;Real&quot;, conf_level = 0.95)</span></span>
+<span id="cb3-20"><a href="#cb3-20" tabindex="-1"></a><span class="co">#&gt;     admixMod2), test_method = &quot;poly&quot;, conf_level = 0.95, ask_poly_param = FALSE, </span></span>
+<span id="cb3-21"><a href="#cb3-21" tabindex="-1"></a><span class="co">#&gt;     support = &quot;Real&quot;)</span></span>
 <span id="cb3-22"><a href="#cb3-22" tabindex="-1"></a><span class="co">#&gt; </span></span>
 <span id="cb3-23"><a href="#cb3-23" tabindex="-1"></a><span class="co">#&gt; Do we reject the null hypothesis? No</span></span>
-<span id="cb3-24"><a href="#cb3-24" tabindex="-1"></a><span class="co">#&gt; Here is the associated p-value of the test: 0.498</span></span></code></pre></div>
+<span id="cb3-24"><a href="#cb3-24" tabindex="-1"></a><span class="co">#&gt; Here is the associated p-value of the test: 0.398</span></span></code></pre></div>
 <p>The hypothesis test concludes that the null hypothesis cannot be
 rejected, once again in line with what was expected given the specified
 parameters when simulating the data.</p>
@@ -496,7 +495,7 @@ parameters when simulating the data.</p>
 to default values (but that the user can choose them setting parameter
 ‘ask_poly_param’ to TRUE):</p>
 <ul>
-<li>‘est.method’ is set to ‘BVdk’ to tell the program to estimate the
+<li>‘est_method’ is set to ‘BVdk’ to tell the program to estimate the
 unknown proportions <span class="math inline">\(p_1\)</span> and <span class="math inline">\(p_2\)</span> using the estimator proposed in <span class="citation">(Bordes and Vandekerkhove 2010)</span>,</li>
 <li>‘K’ equals 3 to mention that such expansions are computed up to the
 third order of the decomposition in the polynomial basis,</li>
@@ -506,7 +505,7 @@ penalization rule used in <span class="citation">(Milhaud et al.
 </ul>
 <p>When the unknown component distributions are not supposed to have
 symmetric densities, another solution to perform the test is to set
-‘est.method’ to ‘PS’ following ‘ask_poly_param’ set to TRUE, but keeping
+‘est_method’ to ‘PS’ following ‘ask_poly_param’ set to TRUE, but keeping
 in mind that plugging in such estimators for the test procedure should
 not be allowed in theory. However, that works quite well in practice.
 Another solution to perform this test in full generality is to use the
@@ -603,17 +602,16 @@ us study the case where we are under the null hypothesis <span class="math inlin
 <span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a>                         <span class="at">knownComp_param =</span> mixt2<span class="sc">$</span>comp.param[[<span class="dv">2</span>]])</span>
 <span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a>admixMod3 <span class="ot">&lt;-</span> <span class="fu">admix_model</span>(<span class="at">knownComp_dist =</span> mixt3<span class="sc">$</span>comp.dist[[<span class="dv">2</span>]],</span>
 <span id="cb4-21"><a href="#cb4-21" tabindex="-1"></a>                         <span class="at">knownComp_param =</span> mixt3<span class="sc">$</span>comp.param[[<span class="dv">2</span>]])</span>
-<span id="cb4-22"><a href="#cb4-22" tabindex="-1"></a><span class="fu">admix_test</span>(<span class="at">samples =</span> <span class="fu">list</span>(data1, data2, data3),</span>
-<span id="cb4-23"><a href="#cb4-23" tabindex="-1"></a>           <span class="at">admixMod =</span> <span class="fu">list</span>(admixMod1, admixMod2, admixMod3),</span>
-<span id="cb4-24"><a href="#cb4-24" tabindex="-1"></a>           <span class="at">test_method =</span> <span class="st">&quot;icv&quot;</span>, <span class="at">n_sim_tab =</span> <span class="dv">8</span>, <span class="at">ICV_tunePenalty =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb4-25"><a href="#cb4-25" tabindex="-1"></a>           <span class="at">conf_level =</span> <span class="fl">0.95</span>, <span class="at">parallel =</span> <span class="cn">FALSE</span>, <span class="at">n_cpu =</span> <span class="dv">2</span>)</span>
+<span id="cb4-22"><a href="#cb4-22" tabindex="-1"></a><span class="fu">admix_test</span>(<span class="at">samples =</span> <span class="fu">list</span>(data1, data2, data3), </span>
+<span id="cb4-23"><a href="#cb4-23" tabindex="-1"></a>           <span class="at">admixMod =</span> <span class="fu">list</span>(admixMod1, admixMod2, admixMod3), </span>
+<span id="cb4-24"><a href="#cb4-24" tabindex="-1"></a>           <span class="at">conf_level =</span> <span class="fl">0.95</span>, <span class="at">test_method =</span> <span class="st">&quot;icv&quot;</span>, <span class="at">n_sim_tab =</span> <span class="dv">8</span>, </span>
+<span id="cb4-25"><a href="#cb4-25" tabindex="-1"></a>           <span class="at">tune_penalty =</span> <span class="cn">FALSE</span>, <span class="at">parallel =</span> <span class="cn">FALSE</span>, <span class="at">n_cpu =</span> <span class="dv">2</span>)</span>
 <span id="cb4-26"><a href="#cb4-26" tabindex="-1"></a><span class="co">#&gt; Call:admix_test(samples = list(data1, data2, data3), admixMod = list(admixMod1, </span></span>
-<span id="cb4-27"><a href="#cb4-27" tabindex="-1"></a><span class="co">#&gt;     admixMod2, admixMod3), test_method = &quot;icv&quot;, n_sim_tab = 8, </span></span>
-<span id="cb4-28"><a href="#cb4-28" tabindex="-1"></a><span class="co">#&gt;     ICV_tunePenalty = FALSE, conf_level = 0.95, parallel = FALSE, </span></span>
-<span id="cb4-29"><a href="#cb4-29" tabindex="-1"></a><span class="co">#&gt;     n_cpu = 2)</span></span>
-<span id="cb4-30"><a href="#cb4-30" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb4-31"><a href="#cb4-31" tabindex="-1"></a><span class="co">#&gt; Do we reject the null hypothesis? No</span></span>
-<span id="cb4-32"><a href="#cb4-32" tabindex="-1"></a><span class="co">#&gt; Here is the associated p-value of the test: 0.75</span></span></code></pre></div>
+<span id="cb4-27"><a href="#cb4-27" tabindex="-1"></a><span class="co">#&gt;     admixMod2, admixMod3), test_method = &quot;icv&quot;, conf_level = 0.95, </span></span>
+<span id="cb4-28"><a href="#cb4-28" tabindex="-1"></a><span class="co">#&gt;     n_sim_tab = 8, tune_penalty = FALSE, parallel = FALSE, n_cpu = 2)</span></span>
+<span id="cb4-29"><a href="#cb4-29" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb4-30"><a href="#cb4-30" tabindex="-1"></a><span class="co">#&gt; Do we reject the null hypothesis? No</span></span>
+<span id="cb4-31"><a href="#cb4-31" tabindex="-1"></a><span class="co">#&gt; Here is the associated p-value of the test: 0.286</span></span></code></pre></div>
 </div>
 <div id="references" class="section level1 unnumbered">
 <h1 class="unnumbered">References</h1>

@@ -5,26 +5,26 @@
 \title{Estimates in an admixture using Patra and Sen approach}
 \usage{
 estim_PS(
-  data,
+  samples,
   admixMod,
-  method = c("lwr.bnd", "fixed", "cv"),
+  method = c("fixed", "lwr.bnd", "cv"),
   c.n = NULL,
   folds = 10,
   reps = 1,
   cn.s = NULL,
   cn.length = 100,
-  gridsize = 600
+  gridsize = 1200
 )
 }
 \arguments{
-\item{data}{Sample to be studied.}
+\item{samples}{Sample to be studied.}
 
 \item{admixMod}{An object of class 'admix_model', containing information about the known component distribution and its parameter(s).}
 
 \item{method}{One of 'lwr.bnd', fixed' or 'cv': depending on whether compute some lower bound of the mixing proportion, the estimate
 based on the value of 'c.n' or use cross-validation for choosing 'c.n' (tuning parameter).}
 
-\item{c.n}{A positive number, with default value equal to 0.1 log(log(n)), where 'n' is the length of the observed sample.}
+\item{c.n}{(default to NULL) A positive number for the penalization, see reference below. If NULL, equals to 0.1*log(log(n)).}
 
 \item{folds}{(optional, default to 10) Number of folds used for cross-validation.}
 
@@ -55,19 +55,17 @@ More information in 'Details' below concerning the estimation method.
 }
 \examples{
 ## Simulate mixture data:
-mixt1 <- twoComp_mixt(n = 800, weight = 0.2,
-                      comp.dist = list("norm", "norm"),
-                      comp.param = list(list("mean" = 3, "sd" = 0.5),
-                                        list("mean" = 0, "sd" = 1)))
+mixt1 <- twoComp_mixt(n = 800, weight = 0.33,
+                      comp.dist = list("gamma", "exp"),
+                      comp.param = list(list("shape" = 2, "scale" = 0.5),
+                                        list("rate" = 0.25)))
 data1 <- getmixtData(mixt1)
-
 ## Define the admixture model:
 admixMod1 <- admix_model(knownComp_dist = mixt1$comp.dist[[2]],
                          knownComp_param = mixt1$comp.param[[2]])
-
 ## Transform the known component of the admixture model into a Uniform(O,1) distribution:
-estim_PS(data = data1, admixMod = admixMod1, method = 'fixed',
-         c.n = 0.1*log(log(length(data1))), gridsize = 1000)
+estim_PS(samples = data1, admixMod = admixMod1, method = 'fixed', c.n = NULL)
+
 
 }
 \references{

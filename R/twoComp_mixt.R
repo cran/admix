@@ -18,19 +18,23 @@
 #'
 #' @examples
 #' ## Mixture of continuous random variables:
-#' sim.X <- twoComp_mixt(n = 2000, weight = 0.5, comp.dist = list("norm", "norm"),
-#'                       comp.param = list(list("mean"=3, "sd"=0.5), list("mean"=0, "sd"=1)))
-#' sim.Y <- twoComp_mixt(n = 1200, weight = 0.7, comp.dist = list("norm", "exp"),
-#'                       comp.param = list(list("mean"=-3, "sd"=0.5), list("rate"=1)))
+#' sim.X <- twoComp_mixt(n = 2000, weight = 0.5,
+#'                       comp.dist = list("norm", "norm"),
+#'                       comp.param = list(list("mean"=3, "sd"=0.5),
+#'                                         list("mean"=0, "sd"=1)))
+#' sim.Y <- twoComp_mixt(n = 1200, weight = 0.7,
+#'                       comp.dist = list("norm", "exp"),
+#'                       comp.param = list(list("mean"=-3, "sd"=0.5),
+#'                                         list("rate"=1)))
 #' print(sim.X)
-#' print(sim.Y)
 #' plot(sim.X, xlim=c(-5,5), ylim=c(0,0.5))
 #' plot(sim.Y, add.plot = TRUE, xlim=c(-5,5), ylim=c(0,0.5), col = "red")
 #'
 #' ## Mixture of discrete random variables:
-#' sim.X <- twoComp_mixt(n = 2000, weight = 0.5, comp.dist = list("multinom", "multinom"),
+#' sim.X <- twoComp_mixt(n = 2000, weight = 0.5,
+#'                       comp.dist = list("multinom", "multinom"),
 #'                       comp.param = list(list("size"=1, "prob"=c(0.3,0.4,0.3)),
-#'                       list("size"=1, "prob"=c(0.1,0.2,0.7))))
+#'                                         list("size"=1, "prob"=c(0.1,0.2,0.7))))
 #' print(sim.X)
 #' plot(sim.X)
 #'
@@ -38,7 +42,7 @@
 #' @export
 
 twoComp_mixt <- function(n = 1000, weight = 0.5, comp.dist = list("norm", "norm"),
-                         comp.param = list(c("mean"=0,"sd"=1), c("mean"=2,"sd"=1)))
+                         comp.param = list(list("mean"=0,"sd"=1), list("mean"=2,"sd"=1)))
 {
   ## Some arguments to check:
   if ( !((weight > 0) & (weight < 1)) ) stop("Mixing proportion in a mixture model must belong to ]0,1[.")
@@ -64,8 +68,12 @@ twoComp_mixt <- function(n = 1000, weight = 0.5, comp.dist = list("norm", "norm"
     if (any(comp.dist == "multinom")) {
       stopifnot("Name of parameters not appropriate" = all(names(comp.param[[k]]) == c("size","prob")))
     } else {
-      stopifnot("Name of parameters not appropriate" =
-        all(as.character(dist_table[rownames(dist_table) == comp.dist[[k]], 4:(4+nparam_theo[k]-1)]) == names(comp.param[[k]])))
+      if (!all(as.character(dist_table[rownames(dist_table) == comp.dist[[k]], 4:(4+nparam_theo[k]-1)]) == names(comp.param[[k]]))) {
+        cat("Name of parameters not appropriate, please provide the following parameters /",
+              as.character(dist_table[rownames(dist_table) == comp.dist[[k]], 4:(4+nparam_theo[k]-1)]), sep = " / ")
+        cat("\n")
+        stop()
+      }
     }
   }
 

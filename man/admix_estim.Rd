@@ -4,24 +4,19 @@
 \alias{admix_estim}
 \title{Estimate the unknown parameters of the admixture model(s)}
 \usage{
-admix_estim(
-  samples,
-  admixMod,
-  est.method = c("BVdk", "PS", "IBM"),
-  sym.f = FALSE
-)
+admix_estim(samples, admixMod, est_method = c("PS", "BVdk", "IBM"), ...)
 }
 \arguments{
-\item{samples}{(list) A list of the K (K>0) samples to be studied, all following admixture distributions.}
+\item{samples}{A list of the K (K>0) samples to be studied, all following admixture distributions.}
 
-\item{admixMod}{(list) A list of objects of class 'admix_model', containing useful information about distributions and parameters.}
+\item{admixMod}{A list of objects of class 'admix_model', containing useful information about distributions and parameters.}
 
-\item{est.method}{The estimation method to be applied. Can be one of 'BVdk' (Bordes and Vandekerkhove estimator), 'PS' (Patra and Sen
-estimator), or 'IBM' (Inversion Best-Matching approach). The same estimation method is performed on each sample.
-Important note: estimation by 'IBM' is unbiased only under H0, meaning that choosing this method requires to perform
-previously the test hypothesis between the pairs of samples. For further details, see section 'Details' below.}
+\item{est_method}{The estimation method to be applied. Can be one of 'BVdk' (Bordes and Vandekerkhove estimator), 'PS' (Patra and Sen
+estimator), or 'IBM' (Inversion Best-Matching approach) in the continuous case (continuous random variable). Only 'IBM' for
+discrete random variables. The same estimation method is performed on each sample if several samples are provided.}
 
-\item{sym.f}{A boolean indicating whether the unknown component densities are assumed to be symmetric or not.}
+\item{...}{Optional arguments to \link[admix]{estim_PS}, \link[admix]{estim_BVdk} or \link[admix]{estim_IBM} depending on the
+choice made by the user for the estimation method.}
 }
 \value{
 An object of class 'admix_estim', containing at least 5 attributes: 1) the number of samples under study; 2) the information
@@ -38,32 +33,32 @@ l_i = p_i * f_i + (1-p_i) * g_i, where g_i is the known component density.
 The unknown quantities p_i and f_i then have to be estimated.
 }
 \details{
-For further details on the different estimation techniques, see references below i) Patra and Sen estimator ;
-ii) BVdk estimator ; iii) IBM approach.
+For further details on the different estimation techniques, see references below on i) Patra and Sen estimator ;
+ii) Bordes and Vandekerkhove estimator ; iii) Inversion Best-Matching approach. Important note: estimation by 'IBM'
+requires at least two samples at hand, and provides unbiased estimators only if the distributions of unknown components
+are equal (meaning that it requires to perform previously this test between the pairs of samples, see ?admix_test).
 }
 \examples{
 ## Simulate mixture data:
-mixt1 <- twoComp_mixt(n = 250, weight = 0.7,
+mixt1 <- twoComp_mixt(n = 300, weight = 0.7,
                       comp.dist = list("norm", "norm"),
                       comp.param = list(list("mean" = -2, "sd" = 0.5),
                                         list("mean" = 0, "sd" = 1)))
-mixt2 <- twoComp_mixt(n = 200, weight = 0.85,
+mixt2 <- twoComp_mixt(n = 250, weight = 0.85,
                       comp.dist = list("norm", "exp"),
-                      comp.param = list(list("mean" = 3, "sd" = 1),
+                      comp.param = list(list("mean" = -2, "sd" = 0.5),
                                         list("rate" = 1)))
 data1 <- getmixtData(mixt1)
 data2 <- getmixtData(mixt2)
-
 ## Define the admixture models:
 admixMod1 <- admix_model(knownComp_dist = mixt1$comp.dist[[2]],
                          knownComp_param = mixt1$comp.param[[2]])
 admixMod2 <- admix_model(knownComp_dist = mixt2$comp.dist[[2]],
                          knownComp_param = mixt2$comp.param[[2]])
-admix_estim(samples = list(data1), admixMod = list(admixMod1),
-            est.method = 'BVdk', sym.f = TRUE)
-admix_estim(samples = list(data1,data2),
-            admixMod = list(admixMod1,admixMod2),
-            est.method = 'PS')
+# Estimation by different methods:
+admix_estim(samples = list(data1), admixMod = list(admixMod1), est_method = "BVdk")
+admix_estim(samples=list(data1,data2), admixMod=list(admixMod1,admixMod2), est_method = "PS")
+admix_estim(samples=list(data1,data2), admixMod=list(admixMod1,admixMod2), est_method = "IBM")
 
 }
 \references{
