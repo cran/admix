@@ -414,7 +414,7 @@ Test $H_0$ the simultaneous equality of all the $f_j$, $j\in S_c$ :\\
 <h2>On <span class="math inline">\(\mathbb{R}^+\)</span></h2>
 <p>We present a case study with 5 populations to cluster on <span class="math inline">\(\mathbb{R}^+\)</span>, with Gamma-Exponential,
 Exponential-Exponential and Gamma-Gamma mixtures.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="co">#set.seed(123)</span></span>
 <span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="do">## Simulate mixture data:</span></span>
 <span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>mixt1 <span class="ot">&lt;-</span> <span class="fu">twoComp_mixt</span>(<span class="at">n =</span> <span class="dv">6000</span>, <span class="at">weight =</span> <span class="fl">0.8</span>,</span>
 <span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>                      <span class="at">comp.dist =</span> <span class="fu">list</span>(<span class="st">&quot;gamma&quot;</span>, <span class="st">&quot;exp&quot;</span>),</span>
@@ -454,13 +454,13 @@ Exponential-Exponential and Gamma-Gamma mixtures.</p>
 <span id="cb4-38"><a href="#cb4-38" tabindex="-1"></a><span class="do">## Look for the clusters:</span></span>
 <span id="cb4-39"><a href="#cb4-39" tabindex="-1"></a><span class="fu">admix_cluster</span>(<span class="at">samples =</span> <span class="fu">list</span>(data1,data2,data3,data4,data5), </span>
 <span id="cb4-40"><a href="#cb4-40" tabindex="-1"></a>              <span class="at">admixMod =</span> <span class="fu">list</span>(admixMod1,admixMod2,admixMod3,admixMod4,admixMod5),</span>
-<span id="cb4-41"><a href="#cb4-41" tabindex="-1"></a>              <span class="at">conf_level =</span> <span class="fl">0.95</span>, <span class="at">parallel =</span> <span class="cn">FALSE</span>, <span class="at">n_cpu =</span> <span class="dv">2</span>, <span class="at">n_sim_tab =</span> <span class="dv">10</span>, </span>
-<span id="cb4-42"><a href="#cb4-42" tabindex="-1"></a>              <span class="at">tune_penalty =</span> <span class="cn">FALSE</span>, <span class="at">tabul_dist =</span> <span class="cn">NULL</span>, <span class="at">echo =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb4-41"><a href="#cb4-41" tabindex="-1"></a>              <span class="at">conf_level =</span> <span class="fl">0.95</span>, <span class="at">tune_penalty =</span> <span class="cn">TRUE</span>, <span class="at">tabul_dist =</span> <span class="cn">NULL</span>, <span class="at">echo =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb4-42"><a href="#cb4-42" tabindex="-1"></a>              <span class="at">n_sim_tab =</span> <span class="dv">50</span>, <span class="at">parallel =</span> <span class="cn">FALSE</span>, <span class="at">n_cpu =</span> <span class="dv">2</span>)</span>
 <span id="cb4-43"><a href="#cb4-43" tabindex="-1"></a><span class="co">#&gt; Call:</span></span>
 <span id="cb4-44"><a href="#cb4-44" tabindex="-1"></a><span class="co">#&gt; admix_cluster(samples = list(data1, data2, data3, data4, data5), </span></span>
 <span id="cb4-45"><a href="#cb4-45" tabindex="-1"></a><span class="co">#&gt;     admixMod = list(admixMod1, admixMod2, admixMod3, admixMod4, </span></span>
-<span id="cb4-46"><a href="#cb4-46" tabindex="-1"></a><span class="co">#&gt;         admixMod5), conf_level = 0.95, n_sim_tab = 10, tune_penalty = FALSE, </span></span>
-<span id="cb4-47"><a href="#cb4-47" tabindex="-1"></a><span class="co">#&gt;     parallel = FALSE, n_cpu = 2, tabul_dist = NULL, echo = FALSE)</span></span>
+<span id="cb4-46"><a href="#cb4-46" tabindex="-1"></a><span class="co">#&gt;         admixMod5), conf_level = 0.95, tune_penalty = TRUE, tabul_dist = NULL, </span></span>
+<span id="cb4-47"><a href="#cb4-47" tabindex="-1"></a><span class="co">#&gt;     echo = FALSE, n_sim_tab = 50, parallel = FALSE, n_cpu = 2)</span></span>
 <span id="cb4-48"><a href="#cb4-48" tabindex="-1"></a><span class="co">#&gt; </span></span>
 <span id="cb4-49"><a href="#cb4-49" tabindex="-1"></a><span class="co">#&gt; Number of detected clusters across the samples provided: 3.</span></span>
 <span id="cb4-50"><a href="#cb4-50" tabindex="-1"></a><span class="co">#&gt; </span></span>

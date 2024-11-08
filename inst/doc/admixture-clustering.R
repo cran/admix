@@ -10,7 +10,7 @@ knitr::opts_chunk$set(
 library(admix)
 
 ## -----------------------------------------------------------------------------
-set.seed(123)
+#set.seed(123)
 ## Simulate mixture data:
 mixt1 <- twoComp_mixt(n = 6000, weight = 0.8,
                       comp.dist = list("gamma", "exp"),
@@ -50,6 +50,6 @@ admixMod5 <- admix_model(knownComp_dist = mixt5$comp.dist[[2]],
 ## Look for the clusters:
 admix_cluster(samples = list(data1,data2,data3,data4,data5), 
               admixMod = list(admixMod1,admixMod2,admixMod3,admixMod4,admixMod5),
-              conf_level = 0.95, parallel = FALSE, n_cpu = 2, n_sim_tab = 10, 
-              tune_penalty = FALSE, tabul_dist = NULL, echo = FALSE)
+              conf_level = 0.95, tune_penalty = TRUE, tabul_dist = NULL, echo = FALSE,
+              n_sim_tab = 50, parallel = FALSE, n_cpu = 2)
 
