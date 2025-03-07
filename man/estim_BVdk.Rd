@@ -4,7 +4,12 @@
 \alias{estim_BVdk}
 \title{Estimation of the admixture parameters by Bordes & Vandekerkhove (2010)}
 \usage{
-estim_BVdk(samples, admixMod, method = c("L-BFGS-B", "Nelder-Mead"))
+estim_BVdk(
+  samples,
+  admixMod,
+  method = c("L-BFGS-B", "Nelder-Mead"),
+  compute_var = FALSE
+)
 }
 \arguments{
 \item{samples}{The observed sample under study.}
@@ -12,13 +17,17 @@ estim_BVdk(samples, admixMod, method = c("L-BFGS-B", "Nelder-Mead"))
 \item{admixMod}{An object of class \link[admix]{admix_model}, containing useful information about distributions and parameters.}
 
 \item{method}{The method used throughout the optimization process, either 'L-BFGS-B' or 'Nelder-Mead' (see ?optim).}
+
+\item{compute_var}{(default to FALSE) A boolean that indicates whether one computes the variance
+of the estimators of unknown mixing proportions and location shift parameter.}
 }
 \value{
-An object of class \link[admix]{estim_BVdk}, containing 7 attributes: 1) the number of sample under study (set to 1 here);
+An object of class \link[admix]{estim_BVdk}, containing 8 attributes: 1) the number of sample under study (set to 1 here);
 2) the sample size; 3) the information about mixture components (distributions and parameters); 4) the estimation
 method (Bordes and Vandekerkhove here, see the given reference); 5) the estimated mixing proportion (weight of the
 unknown component distribution); 6) the estimated location parameter of the unknown component distribution (with symetric
-density); 7) the optimization method that was used.
+density); 7) the variance of the two estimators (respectively the mixing proportion and location shift); 8) the optimization
+method that was used.
 }
 \description{
 Estimates parameters in an admixture model where the unknown component is assumed to have a symmetric density.
@@ -51,7 +60,8 @@ data2 <- getmixtData(mixt2)
 admixMod2 <- admix_model(knownComp_dist = mixt2$comp.dist[[2]],
                         knownComp_param = mixt2$comp.param[[2]])
 ## Perform the estimation of parameters in real-life:
-estim_BVdk(samples = data2, admixMod = admixMod2, method = 'L-BFGS-B')
+estim_BVdk(samples = data2, admixMod = admixMod2, method = 'L-BFGS-B',
+           compute_var = TRUE)
 
 }
 \references{

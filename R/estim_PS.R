@@ -132,8 +132,8 @@ print.estim_PS <- function(x, ...){
   cat("Call:")
   print(x$call)
   if(x$method != "lwr.bnd"){
-    cat("\n", paste("Estimate of the mixing weight (proportion of the unknown component distribution) is" , round(x$estimated_mixing_weights,2)))
-    cat("\n", paste("The chosen value c_n is", round(x$c.n, 3)), "\n")
+    cat("\n", paste("Estimate of the mixing weight (proportion of the unknown component distribution): " , round(x$estimated_mixing_weights,2)))
+    #cat("\n", paste("The chosen value c_n is", round(x$c.n, 3)), "\n")
     if( !is.null(x$cv.out)){
       old_par <- graphics::par()$mfrow
       graphics::par(mfrow=c(1,2))
@@ -327,6 +327,19 @@ plot.PS_estimCV <- function(x,...)
 }
 
 
+#' Function that computes the cross-validation score
+#'
+#' @param tr.data An object of class 'PS_dist_fun'.
+#' @param test.data The data used in the test sample.
+#' @param c.n The coefficient in the penalization.
+#'
+#' @references
+#' \insertRef{PatraSen2016}{admix}
+#'
+#' @return The loss corresponding to the cross-validation error.
+#'
+#' @author Xavier Milhaud <xavier.milhaud.research@gmail.com>
+#' @noRd
 
 cv.score <- function(tr.data, test.data, c.n)
 {

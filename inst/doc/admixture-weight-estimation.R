@@ -9,7 +9,7 @@ knitr::opts_chunk$set(
 ## ----setup--------------------------------------------------------------------
 library(admix)
 
-## -----------------------------------------------------------------------------
+## ----sym----------------------------------------------------------------------
 ## Simulate mixture data:
 mixt1 <- twoComp_mixt(n = 400, weight = 0.7,
                       comp.dist = list("norm", "norm"),
@@ -21,10 +21,10 @@ admixMod <- admix_model(knownComp_dist = mixt1$comp.dist[[2]],
                         knownComp_param = mixt1$comp.param[[2]])
 admix_estim(samples = list(data1), admixMod = list(admixMod), est_method = 'BVdk')
 
-## -----------------------------------------------------------------------------
+## ----generalCase--------------------------------------------------------------
 admix_estim(samples = list(data1), admixMod = list(admixMod), est_method = 'PS')
 
-## -----------------------------------------------------------------------------
+## ----twoSampleNullHyp---------------------------------------------------------
 ## Simulate mixture data:
 mixt1 <- twoComp_mixt(n = 450, weight = 0.4,
                       comp.dist = list("norm", "norm"),
@@ -44,7 +44,7 @@ admixMod2 <- admix_model(knownComp_dist = mixt2$comp.dist[[2]],
 admix_estim(samples = list(data1, data2), admixMod = list(admixMod1, admixMod2),
             est_method = 'IBM')
 
-## -----------------------------------------------------------------------------
+## ----twoSampleAltHyp----------------------------------------------------------
 ## Simulate mixture data:
 mixt1 <- twoComp_mixt(n = 800, weight = 0.5,
                       comp.dist = list("norm", "norm"),
@@ -69,7 +69,7 @@ admix_estim(samples = list(data1, data2), admixMod = list(admixMod1, admixMod2),
 admix_estim(samples = list(data1, data2), admixMod = list(admixMod1, admixMod2),
             est_method = 'PS')
 
-## -----------------------------------------------------------------------------
+## ----decontDens---------------------------------------------------------------
 ## Simulate mixture data:
 mixt1 <- twoComp_mixt(n = 800, weight = 0.4,
                       comp.dist = list("norm", "norm"),

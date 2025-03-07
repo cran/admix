@@ -14,7 +14,7 @@
 #' @param ask_poly_param (default to FALSE) If TRUE, ask the user to choose both the order 'K' of expansion coefficients in the
 #'                        orthonormal polynomial basis, and the penalization rate 's' involved on the penalization rule for the test.
 #' @param K (K > 0, default to 3) If not asked (see the previous argument), number of coefficients considered for the polynomial basis expansion.
-#' @param s (in ]0,1/2[, default to 0.49) If not asked (see the previous argument), rate at which the normalization factor is set in
+#' @param s (in ]0,1/2[, default to 0.25) If not asked (see the previous argument), rate at which the normalization factor is set in
 #'           the penalization rule for model selection (in ]0,1/2[). Low values of 's' favors the detection of alternative hypothesis.
 #'           See reference below.
 #' @param nb_echBoot (default to 100) Number of bootstrap samples, useful when choosing 'PS' estimation method.
@@ -59,7 +59,7 @@
 #' @export
 
 orthobasis_test <- function(samples, admixMod, conf_level = 0.95, est_method = c("BVdk","PS"),
-                            ask_poly_param = FALSE, K = 3, s = 0.49, nb_echBoot = 100,
+                            ask_poly_param = FALSE, K = 3, s = 0.25, nb_echBoot = 100,
                             support = c("Real","Integer","Positive","Bounded.continuous","Bounded.discrete"),
                             bounds_supp = NULL, ...)
 {
@@ -80,6 +80,7 @@ orthobasis_test <- function(samples, admixMod, conf_level = 0.95, est_method = c
     K.user <- K
     s.user <- s
   }
+  if ((s.user <= 0) | (s.user >= 0.5)) stop("The penalty exponent 's' was not correctly defined.")
 
   ## Extract useful information about known component distribution:
   knownComp.sim <- paste0("r", sapply(admixMod, "[[", "comp.dist")["known", ])
@@ -131,15 +132,13 @@ orthobasis_test <- function(samples, admixMod, conf_level = 0.95, est_method = c
     hat.p1 <- getmixingWeight(PS_est1)
     hat.p2 <- getmixingWeight(PS_est2)
   } else {
-    BVdk_est1 <- estim_BVdk(samples = data.p1, admixMod = admixMod[[1]], ...)
-    BVdk_est2 <- estim_BVdk(samples = data.p2, admixMod = admixMod[[2]], ...)
+    BVdk_est1 <- estim_BVdk(samples = data.p1, admixMod = admixMod[[1]], compute_var = TRUE, ...)
+    BVdk_est2 <- estim_BVdk(samples = data.p2, admixMod = admixMod[[2]], compute_var = TRUE, ...)
     hat.p1 <- getmixingWeight(BVdk_est1)
     hat.p2 <- getmixingWeight(BVdk_est2)
     ## Estimation of the variances of the estimators :
-    varCov.p1 <- BVdk_varCov_estimators(estim = BVdk_est1, data = data.p1, admixMod = admixMod[[1]])
-    var_hat.p1 <- varCov.p1$var.estim_prop
-    varCov.p2 <- BVdk_varCov_estimators(estim = BVdk_est2, data = data.p2, admixMod = admixMod[[2]])
-    var_hat.p2 <- varCov.p2$var.estim_prop
+    var_hat.p1 <- BVdk_est1$mix_weight_variance
+    var_hat.p2 <- BVdk_est2$mix_weight_variance
   }
 
   ##-------- Computation of the test statistic U -----------##

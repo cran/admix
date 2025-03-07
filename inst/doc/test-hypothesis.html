@@ -433,8 +433,8 @@ an example of hypothesis testing in this 1-sample case:</p>
 <span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a><span class="co">#&gt;     test_method = &quot;poly&quot;, conf_level = 0.95, ask_poly_param = FALSE, </span></span>
 <span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a><span class="co">#&gt;     support = &quot;Real&quot;)</span></span>
 <span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a><span class="co">#&gt; Do we reject the null hypothesis? No</span></span>
-<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a><span class="co">#&gt; Here is the associated p-value of the test: 0.668</span></span></code></pre></div>
+<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a><span class="co">#&gt; Is the null hypothesis H0 rejected? No</span></span>
+<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a><span class="co">#&gt; p-value of the test: 0.682</span></span></code></pre></div>
 <p>The result of the test is that we cannot reject the null hypothesis
 <span class="math inline">\(H_0\)</span>, which is in line with the
 specified distribution for the unknown component. Indeed, simulated data
@@ -486,8 +486,8 @@ whether the test provides satisfactory results.</p>
 <span id="cb3-20"><a href="#cb3-20" tabindex="-1"></a><span class="co">#&gt;     admixMod2), test_method = &quot;poly&quot;, conf_level = 0.95, ask_poly_param = FALSE, </span></span>
 <span id="cb3-21"><a href="#cb3-21" tabindex="-1"></a><span class="co">#&gt;     support = &quot;Real&quot;)</span></span>
 <span id="cb3-22"><a href="#cb3-22" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb3-23"><a href="#cb3-23" tabindex="-1"></a><span class="co">#&gt; Do we reject the null hypothesis? No</span></span>
-<span id="cb3-24"><a href="#cb3-24" tabindex="-1"></a><span class="co">#&gt; Here is the associated p-value of the test: 0.496</span></span></code></pre></div>
+<span id="cb3-23"><a href="#cb3-23" tabindex="-1"></a><span class="co">#&gt; Is the null hypothesis H0 rejected? No</span></span>
+<span id="cb3-24"><a href="#cb3-24" tabindex="-1"></a><span class="co">#&gt; p-value of the test: 0.096</span></span></code></pre></div>
 <p>The hypothesis test concludes that the null hypothesis cannot be
 rejected, once again in line with what was expected given the specified
 parameters when simulating the data.</p>
@@ -517,7 +517,7 @@ IBM method (see below).</p>
 Matching approach, see <span class="citation">(Milhaud et al.
 2024b)</span>. In this case, one can still use the function with same
 first arguments except ‘method’, and ‘method’ should be set to ‘icv’.
-The user also has to define the number of simulated gaussian processes
+The user also has to define the number of simulated Gaussian processes
 used to tabulate the test statistic distribution (‘n_sim_tab’), and can
 accelerate computations using parallel computations and choosing an
 adequate number of cpus. Other arguments such as <span class="math inline">\(support\)</span> are useless.</p>
@@ -604,14 +604,14 @@ us study the case where we are under the null hypothesis <span class="math inlin
 <span id="cb4-21"><a href="#cb4-21" tabindex="-1"></a>                         <span class="at">knownComp_param =</span> mixt3<span class="sc">$</span>comp.param[[<span class="dv">2</span>]])</span>
 <span id="cb4-22"><a href="#cb4-22" tabindex="-1"></a><span class="fu">admix_test</span>(<span class="at">samples =</span> <span class="fu">list</span>(data1, data2, data3), </span>
 <span id="cb4-23"><a href="#cb4-23" tabindex="-1"></a>           <span class="at">admixMod =</span> <span class="fu">list</span>(admixMod1, admixMod2, admixMod3), </span>
-<span id="cb4-24"><a href="#cb4-24" tabindex="-1"></a>           <span class="at">conf_level =</span> <span class="fl">0.95</span>, <span class="at">test_method =</span> <span class="st">&quot;icv&quot;</span>, <span class="at">n_sim_tab =</span> <span class="dv">8</span>, </span>
+<span id="cb4-24"><a href="#cb4-24" tabindex="-1"></a>           <span class="at">conf_level =</span> <span class="fl">0.95</span>, <span class="at">test_method =</span> <span class="st">&quot;icv&quot;</span>, <span class="at">n_sim_tab =</span> <span class="dv">4</span>, </span>
 <span id="cb4-25"><a href="#cb4-25" tabindex="-1"></a>           <span class="at">tune_penalty =</span> <span class="cn">FALSE</span>, <span class="at">parallel =</span> <span class="cn">FALSE</span>, <span class="at">n_cpu =</span> <span class="dv">2</span>)</span>
 <span id="cb4-26"><a href="#cb4-26" tabindex="-1"></a><span class="co">#&gt; Call:admix_test(samples = list(data1, data2, data3), admixMod = list(admixMod1, </span></span>
 <span id="cb4-27"><a href="#cb4-27" tabindex="-1"></a><span class="co">#&gt;     admixMod2, admixMod3), test_method = &quot;icv&quot;, conf_level = 0.95, </span></span>
-<span id="cb4-28"><a href="#cb4-28" tabindex="-1"></a><span class="co">#&gt;     n_sim_tab = 8, tune_penalty = FALSE, parallel = FALSE, n_cpu = 2)</span></span>
+<span id="cb4-28"><a href="#cb4-28" tabindex="-1"></a><span class="co">#&gt;     n_sim_tab = 4, tune_penalty = FALSE, parallel = FALSE, n_cpu = 2)</span></span>
 <span id="cb4-29"><a href="#cb4-29" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb4-30"><a href="#cb4-30" tabindex="-1"></a><span class="co">#&gt; Do we reject the null hypothesis? No</span></span>
-<span id="cb4-31"><a href="#cb4-31" tabindex="-1"></a><span class="co">#&gt; Here is the associated p-value of the test: 0.833</span></span></code></pre></div>
+<span id="cb4-30"><a href="#cb4-30" tabindex="-1"></a><span class="co">#&gt; Is the null hypothesis H0 rejected? No</span></span>
+<span id="cb4-31"><a href="#cb4-31" tabindex="-1"></a><span class="co">#&gt; p-value of the test: 0.667</span></span></code></pre></div>
 </div>
 <div id="references" class="section level1 unnumbered">
 <h1 class="unnumbered">References</h1>

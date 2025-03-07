@@ -11,8 +11,8 @@
 #' @param conf_level The confidence level of the K-sample test.
 #' @param sim_U (default to NULL) Random draws of the inner convergence part of the contrast as defined in the IBM approach (see 'Details' below).
 #' @param tune_penalty (default to TRUE) A boolean that allows to choose between a classical penalty term or an optimized penalty (embedding
-#'                     some tuning parameters, automatically optimized). Optimized penalty is very useful for low or unbalanced sample sizes
-#'                     to detect alternatives to the null hypothesis (H0).
+#'                     some tuning parameters, automatically optimized). Optimized penalty is particularly useful for low or unbalanced sample sizes
+#'                     to detect alternatives to the null hypothesis (H0). It is recommended to set it to TRUE.
 #' @param n_sim_tab (default to 100) Number of simulated Gaussian processes when tabulating the inner convergence distribution
 #'                  in the 'icv' testing method using the IBM estimation approach.
 #' @param parallel (default to FALSE) Boolean to indicate whether parallel computations are performed (speed-up the tabulation).
@@ -60,8 +60,8 @@
 #' ## Perform the 3-samples test:
 #' IBM_k_samples_test(samples = list(data1, data2, data3),
 #'                    admixMod = list(admixMod1, admixMod2, admixMod3),
-#'                    conf_level = 0.95, parallel = FALSE, n_cpu = 2,
-#'                    sim_U = NULL, n_sim_tab = 8, tune_penalty = FALSE)
+#'                    conf_level = 0.95, sim_U = NULL, n_sim_tab = 8,
+#'                    tune_penalty = FALSE, parallel = FALSE, n_cpu = 2)
 #' }
 #'
 #' @author Xavier Milhaud <xavier.milhaud.research@gmail.com>
@@ -235,7 +235,7 @@ IBM_k_samples_test <- function(samples, admixMod, conf_level = 0.95, sim_U = NUL
       ## Define the penalty function, depending on the penalty rule:
       penalty <- penalty_rule * cst_selected * minimal_size^epsilon_null + (1-penalty_rule) * cst_selected * minimal_size^epsilon_alt
     } else {
-      ## Apply the simple n^epsilon, taking epsilon right in the]0.5,0.9[:
+      ## Apply the simple n^epsilon, taking epsilon right in the middle of ]0.75,1[:
       penalty_rule <- NA
       penalty <- minimal_size^0.87
     }
@@ -339,9 +339,9 @@ print.IBM_test <- function(x, ...)
   cat("Call:")
   print(x$call)
   cat("\n")
-  cat("Is the null hypothesis (equal unknown component distributions) rejected? ",
+  cat("Is the null hypothesis (equal unknown distributions) rejected? ",
       ifelse(x$reject_decision, "Yes", "No"), sep="")
-  cat("\nTest p-value: ", round(x$p_value,3), "\n", sep="")
+  cat("\np-value of the test: ", round(x$p_value,3), "\n", sep="")
 }
 
 
@@ -357,9 +357,9 @@ summary.IBM_test <- function(object, ...)
 {
   cat("Call:")
   print(object$call)
-  cat("\n--------- About samples ---------\n")
+  cat("\n------- About samples -------\n")
   cat(paste("Size of sample ", 1:object$n_populations, ": ", object$population_sizes, sep = ""), sep = "\n")
-  cat("\n-------- About contamination (admixture) models -------")
+  cat("\n------ About contamination (admixture) models -----")
   cat("\n")
   if (object$n_populations == 1) {
     cat("-> Distribution and parameters of the known component \n for the admixture model: ", sep="")
@@ -372,20 +372,20 @@ summary.IBM_test <- function(object, ...)
       cat("\n")
     }
   }
-  cat("\n------- Test decision -------\n")
-  cat("Is the null hypothesis (equality of unknown component distributions) rejected? ",
+  cat("\n----- Test decision -----\n")
+  cat("Is the null hypothesis (equality of unknown distributions) rejected? ",
       ifelse(object$reject_decision, "Yes", "No"), sep="")
   cat("\nConfidence level of the test: ", object$confidence_level, sep="")
-  cat("\nTest p-value: ", round(object$p_value,3), sep="")
-  cat("\n\n------- Test statistic -------\n")
-  cat("Selected rank of the test statistic (following the penalization rule): ", object$selected_rank, sep="")
+  cat("\np-value of the test: ", round(object$p_value,3), sep="")
+  cat("\n\n----- Test statistic -----\n")
+  cat("Selected rank of the test statistic (following penalization rule): ", object$selected_rank, sep="")
   cat("\nValue of the test statistic: ", round(object$test_statistic_value,2), "\n", sep="")
   cat("Discrepancy terms involved in the statistic: ", paste(object$statistic_name, sep = ""), "\n", sep = "")
-  cat("Optimal tuning parameters involved in the test statistic (if argument 'tune.penalty' is true):\n")
+  cat("Optimal tuning parameters (if argument 'tune.penalty' is true):\n")
   cat("Gamma: ", object$tuned_gamma, "\n", sep = "")
   cat("Constant: ", object$tuned_constant, "\n", sep = "")
   cat("Chosen penalty rule: ", ifelse(object$penalty_nullHyp, "H0", "H1"), sep = "")
-  cat("\n\n------- Tabulated test statistic distribution -------\n")
+  cat("\n\n----- Tabulated test statistic distribution -----\n")
   cat("Quantile at level ", object$confidence_level*100, "%: ", round(object$extreme_quantile_tabul, 3), "\n", sep = "")
   cat("Tabulated distribution: ", paste(utils::head(round(sort(object$tabulated_dist),2),3), collapse = " "), "....",
       paste(utils::tail(round(sort(object$tabulated_dist),2),3), collapse = " "), "\n", sep = "")
@@ -484,7 +484,7 @@ IBM_2samples_test <- function(samples, admixMod, conf_level = 0.95, parallel = F
   ## Earn computation time using this soft version of the green light criterion:
   if (any(abs(estim.weights) > 1)) {
     reject <- TRUE
-    p_value <- 1e-16
+    p_value <- 1e-12
     sim_U <- extreme_quantile <- NA
   } else {
     if (is.null(sim_U)) {
@@ -574,7 +574,9 @@ IBM_greenLight_criterion <- function(estim_obj, samples, admixMod, alpha = 0.05)
   min_sample_size <- min(length(samples[[1]]), length(samples[[2]]))
   length.support <- length(estim_obj$integ.supp)
   z <- estim_obj$integ.supp[round(floor(length.support/2))]
-  varCov_estim <- IBM_estimVarCov_gaussVect(x = z, y = z, IBMestim.obj = estim_obj, samples = samples, admixMod = admixMod)
+  varCov_estim <- IBM_estimVarCov_gaussVect(x = z, y = z, mixing_weights = estim_obj$estimated_mixing_weights,
+                                            fixed_prop = estim_obj$p.X.fixed, integration_supp = estim_obj$integ.supp,
+                                            samples = samples, admixMod = admixMod)
 
   if (length(estim_obj$estimated_mixing_weights) == 2) {
     inf_bound.p1 <- estim_obj$estimated_mixing_weights[1] - sqrt(varCov_estim[1,1]/min_sample_size) * stats::qnorm(p=(1-alpha/4), mean=0, sd=1)
@@ -717,7 +719,7 @@ IBM_tabul_stochasticInteg <- function(samples, admixMod, min_size = NULL, n.varC
   ## Compute the normalization matrix M(.) at each point, to be used further when determining the full simulated trajectories:
   normalization_factors <-
     foreach::foreach (i = 1:length(t_seq), .inorder = TRUE, .errorhandling = 'pass', .export = ls(globalenv())) %fun% {
-      IBM_normalization_term(t_seq[i], estim, samples, admixMod)
+      IBM_normalization_term(t_seq[i], estim$estimated_mixing_weights, estim$p.X.fixed, estim$integ.supp, samples, admixMod)
     }
 
   ## Estimate the variance-covariance functions from the empirical processes:
