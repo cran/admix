@@ -39,11 +39,11 @@ sim.X <- twoComp_mixt(n = 2000, weight = 0.5,
                       comp.dist = list("norm", "norm"),
                       comp.param = list(list("mean"=3, "sd"=0.5),
                                         list("mean"=0, "sd"=1)))
+print(sim.X)
 sim.Y <- twoComp_mixt(n = 1200, weight = 0.7,
                       comp.dist = list("norm", "exp"),
                       comp.param = list(list("mean"=-3, "sd"=0.5),
                                         list("rate"=1)))
-print(sim.X)
 plot(sim.X, xlim=c(-5,5), ylim=c(0,0.5))
 plot(sim.Y, add.plot = TRUE, xlim=c(-5,5), ylim=c(0,0.5), col = "red")
 
@@ -52,7 +52,6 @@ sim.X <- twoComp_mixt(n = 2000, weight = 0.5,
                       comp.dist = list("multinom", "multinom"),
                       comp.param = list(list("size"=1, "prob"=c(0.3,0.4,0.3)),
                                         list("size"=1, "prob"=c(0.1,0.2,0.7))))
-print(sim.X)
 plot(sim.X)
 
 }

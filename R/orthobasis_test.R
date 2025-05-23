@@ -7,7 +7,7 @@
 #'
 #' @param samples List of the two samples, each one following the mixture distribution given by l = p*f + (1-p)*g,
 #'                with f and p unknown and g known.
-#' @param admixMod An object of class \link[admix]{admix_model}, containing useful information about distributions and parameters.
+#' @param admixMod A list of objects of class \link[admix]{admix_model}, containing useful information about distributions and parameters.
 #' @param conf_level The confidence level, default to 95 percent. Equals 1-alpha, where alpha is the level of the test (type-I error).
 #' @param est_method Estimation method to get the component weights, either 'PS' (Patra and Sen estimation) or 'BVdk'
 #'                   (Bordes and Vendekerkhove estimation). Choosing 'PS' requires to specify the number of bootstrap samples.
@@ -34,7 +34,7 @@
 #'         10) a vector of estimates, related to the estimated mixing proportions in the two samples.
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' #### Under the null hypothesis H0.
 #' mixt1 <- twoComp_mixt(n = 300, weight = 0.77,
 #'                       comp.dist = list("norm", "exp"),
@@ -56,14 +56,18 @@
 #' }
 #'
 #' @author Xavier Milhaud <xavier.milhaud.research@gmail.com>
-#' @export
+#' @keywords internal
 
 orthobasis_test <- function(samples, admixMod, conf_level = 0.95, est_method = c("BVdk","PS"),
                             ask_poly_param = FALSE, K = 3, s = 0.25, nb_echBoot = 100,
                             support = c("Real","Integer","Positive","Bounded.continuous","Bounded.discrete"),
                             bounds_supp = NULL, ...)
 {
+  if (!all(sapply(X = admixMod, FUN = inherits, what = "admix_model")))
+    stop("Argument 'admixMod' is not correctly specified. See ?admix_model.")
+
   old_options_warn <- base::options()$warn
+  on.exit(base::options(warn = old_options_warn))
   base::options(warn = -1)
 
   support <- match.arg(support)
@@ -134,8 +138,8 @@ orthobasis_test <- function(samples, admixMod, conf_level = 0.95, est_method = c
   } else {
     BVdk_est1 <- estim_BVdk(samples = data.p1, admixMod = admixMod[[1]], compute_var = TRUE, ...)
     BVdk_est2 <- estim_BVdk(samples = data.p2, admixMod = admixMod[[2]], compute_var = TRUE, ...)
-    hat.p1 <- getmixingWeight(BVdk_est1)
-    hat.p2 <- getmixingWeight(BVdk_est2)
+    hat.p1 <- BVdk_est1$estimated_mixing_weights
+    hat.p2 <- BVdk_est2$estimated_mixing_weights
     ## Estimation of the variances of the estimators :
     var_hat.p1 <- BVdk_est1$mix_weight_variance
     var_hat.p2 <- BVdk_est2$mix_weight_variance
@@ -212,34 +216,44 @@ orthobasis_test <- function(samples, admixMod, conf_level = 0.95, est_method = c
   ## Selection de l'ordre jusqu'auquel aller:
   indice.opt <- which.max(penalized.T.stat)
   ## Final assessment of the test statistic: select the right statistic value
-  stat.test.final <- T.stat[indice.opt]
+  stat_value <- T.stat[indice.opt]
 
   ##---- Decision to reject the null hypothesis (or not) ----##
   rej <- FALSE
-  if (stat.test.final > stats::qchisq(conf_level,1)) rej <- TRUE
+  if (stat_value > stats::qchisq(conf_level,1)) rej <- TRUE
   ## p-value of the test:
-  pvalu <- 1 - stats::pchisq(stat.test.final, 1)
+  pvalu <- 1 - stats::pchisq(stat_value, 1)
 
   ## Save memory :
   rm(data.coef1) ; rm(data.coef2) ; rm(data.p1) ; rm(data.p2)
   rm(moy.coef1) ; rm(moy.coef2) ; rm(var.coef1) ; rm(var.coef2)
 
+  names(stat_value) <- "Chi-square"
+  stat_param <- 1 ; names(stat_param) <- "df"
+  estimated_values <- vector(mode = "numeric", length = 2L)
+  estimated_values <- c(hat.p1,hat.p2)
+  names(estimated_values) <- c("Weight in 1st sample","Weight in 2nd sample")
+
   obj <- list(
+    null.value = stats::qchisq(conf_level,1),
+    alternative = "greater",
+    method = "Equality test of unknown distributions (polynomial expansions of pdfs)",
+    estimate = estimated_values,
+    data.name = deparse(substitute(samples)),
+    statistic = stat_value,
+    parameters = stat_param,
+    p.value = pvalu,
     n_populations = 2,
     population_sizes = c(n1,n2),
     admixture_models = admixMod,
     reject_decision = rej,
     confidence_level = conf_level,
-    p_value = pvalu,
-    test_statistic_value = stat.test.final,
     varCov_matrix = var.T,
-    selected_rank = indice.opt,
-    estimated_mixing_weights = c(hat.p1,hat.p2)
+    selected_rank = indice.opt
     )
-  obj$call <- match.call()
-  class(obj) <- c("orthobasis_test", "admix_test")
 
-  on.exit(base::options(warn = old_options_warn))
+  obj$call <- match.call()
+  class(obj) <- c("orthobasis_test", "htest")
   return(obj)
 }
 
@@ -250,16 +264,22 @@ orthobasis_test <- function(samples, admixMod, conf_level = 0.95, est_method = c
 #' @param ... A list of additional parameters belonging to the default method.
 #'
 #' @author Xavier Milhaud <xavier.milhaud.research@gmail.com>
-#' @export
+#' @keywords internal
+#' @noRd
 
 print.orthobasis_test <- function(x, ...)
 {
   cat("Call:")
   print(x$call)
   cat("\n")
-  cat("Is the null hypothesis (gaussian unknown component distribution) rejected? ",
+  cat("Is the null hypothesis rejected (same distribution for unknown components) ? ",
       ifelse(x$reject_decision, "Yes", "No"), sep="")
-  cat("\nTest p-value: ", round(x$p_value,3), "\n", sep="")
+  if (round(x$p.value, 3) == 0) {
+    cat("\np-value of the test: 1e-12", sep="")
+  } else {
+    cat("\np-value of the test: ", round(x$p.value, 3), sep="")
+  }
+  cat("\n")
 }
 
 
@@ -269,7 +289,8 @@ print.orthobasis_test <- function(x, ...)
 #' @param ... A list of additional parameters belonging to the default method.
 #'
 #' @author Xavier Milhaud <xavier.milhaud.research@gmail.com>
-#' @export
+#' @keywords internal
+#' @noRd
 
 summary.orthobasis_test <- function(object, ...)
 {
@@ -284,17 +305,18 @@ summary.orthobasis_test <- function(object, ...)
     cat(paste(sapply(object$admixture_models[[k]], "[[", "known")[1:2], collapse = " - "))
     cat("\n")
   }
-  cat("------- Test decision -------\n")
-  cat("Is the null hypothesis (equality of unknown component distributions) rejected? ",
+  cat("\n------- Test decision -------\n")
+  cat("Method: ", object$method, "\n", sep = "")
+  cat("Is the null hypothesis rejected (equality of unknown component distributions)? ",
       ifelse(object$reject_decision, "Yes", "No"), sep="")
   cat("\nConfidence level of the test: ", object$confidence_level, sep="")
-  cat("\nTest p-value: ", round(object$p_value,3), sep="")
+  cat("\nTest p-value: ", round(object$p.value,3), sep="")
   cat("\n\n------- Test statistic -------\n")
   cat("Selected rank of the test statistic (following the penalization rule): ", object$selected_rank, sep="")
-  cat("\nValue of the test statistic: ", round(object$test_statistic_value,4), "\n", sep="")
+  cat("\nValue of the test statistic: ", round(object$statistic,4), "\n", sep="")
   cat("Variance-covariance matrix of the test statistic (at each order of expansion):\n", sep = "")
   print(object$varCov_matrix)
   cat("\n------- Estimates -------\n")
   cat("Estimated mixing proportion (listed in the same order as samples): ",
-      paste(round(object$estimated_mixing_weights,3), collapse = " "), "\n", sep = "")
+      paste(round(object$estimate,3), collapse = " "), "\n", sep = "")
 }

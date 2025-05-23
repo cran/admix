@@ -2,7 +2,7 @@
 % Please edit documentation in R/decontaminated_density.R
 \name{plot.decontaminated_density}
 \alias{plot.decontaminated_density}
-\title{Plot method for class 'decontaminated_density'}
+\title{Plot method for object of class 'decontaminated_density'}
 \usage{
 \method{plot}{decontaminated_density}(x, x_val, add_plot = FALSE, ...)
 }
@@ -14,7 +14,7 @@
 \item{add_plot}{(default to FALSE) A boolean specifying if one plots the decontaminated density over an existing plot. Used for visual
 comparison purpose.}
 
-\item{...}{Arguments to be passed to generic method 'plot', such as graphical parameters (see par).}
+\item{...}{Arguments to be passed to generic method 'plot', such as graphical parameters (see ?par).}
 }
 \value{
 The plot of the decontaminated density.

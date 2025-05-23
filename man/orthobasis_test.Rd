@@ -22,7 +22,7 @@ orthobasis_test(
 \item{samples}{List of the two samples, each one following the mixture distribution given by l = p*f + (1-p)*g,
 with f and p unknown and g known.}
 
-\item{admixMod}{An object of class \link[admix]{admix_model}, containing useful information about distributions and parameters.}
+\item{admixMod}{A list of objects of class \link[admix]{admix_model}, containing useful information about distributions and parameters.}
 
 \item{conf_level}{The confidence level, default to 95 percent. Equals 1-alpha, where alpha is the level of the test (type-I error).}
 
@@ -65,7 +65,7 @@ functions (pdf) l1 = p1*f1 + (1-p1)\emph{g1 and l2 = p2}f2 + (1-p2)*g2, where g1
 are observed. The admixture weights p1 and p2 thus have to be estimated. For further information on this method, see 'Details' below.
 }
 \examples{
-\donttest{
+\dontrun{
 #### Under the null hypothesis H0.
 mixt1 <- twoComp_mixt(n = 300, weight = 0.77,
                       comp.dist = list("norm", "exp"),
@@ -93,3 +93,4 @@ orthobasis_test(samples = list(data1,data2), admixMod = list(admixMod1,admixMod2
 \author{
 Xavier Milhaud \href{mailto:xavier.milhaud.research@gmail.com}{xavier.milhaud.research@gmail.com}
 }
+\keyword{internal}

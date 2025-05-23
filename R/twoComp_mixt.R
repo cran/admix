@@ -22,11 +22,11 @@
 #'                       comp.dist = list("norm", "norm"),
 #'                       comp.param = list(list("mean"=3, "sd"=0.5),
 #'                                         list("mean"=0, "sd"=1)))
+#' print(sim.X)
 #' sim.Y <- twoComp_mixt(n = 1200, weight = 0.7,
 #'                       comp.dist = list("norm", "exp"),
 #'                       comp.param = list(list("mean"=-3, "sd"=0.5),
 #'                                         list("rate"=1)))
-#' print(sim.X)
 #' plot(sim.X, xlim=c(-5,5), ylim=c(0,0.5))
 #' plot(sim.Y, add.plot = TRUE, xlim=c(-5,5), ylim=c(0,0.5), col = "red")
 #'
@@ -35,7 +35,6 @@
 #'                       comp.dist = list("multinom", "multinom"),
 #'                       comp.param = list(list("size"=1, "prob"=c(0.3,0.4,0.3)),
 #'                                         list("size"=1, "prob"=c(0.1,0.2,0.7))))
-#' print(sim.X)
 #' plot(sim.X)
 #'
 #' @author Xavier Milhaud <xavier.milhaud.research@gmail.com>
@@ -136,6 +135,8 @@ twoComp_mixt <- function(n = 1000, weight = 0.5, comp.dist = list("norm", "norm"
 
 plot.twoComp_mixt <- function(x, add.plot = FALSE, ...)
 {
+  old_par_new <- graphics::par()$new
+  on.exit(graphics::par(new = old_par_new))
   if (add.plot) {
     graphics::par(new = TRUE)
   }
@@ -145,13 +146,12 @@ plot.twoComp_mixt <- function(x, add.plot = FALSE, ...)
   if (all(x$dist.type != "Discrete")) {
     base::plot(densities, ...)
   } else {
-    ## FIXME: pour breaks' defini comme ci-dessous, cela ne marche que si la loi discrete est a support positif!
+    ## FIXME: pour 'breaks' defini comme ci-dessous, cela ne marche que si la loi discrete est a support positif!
     #graphics::hist(x$mixt.data, freq = TRUE, breaks = 0:ceiling(x.axis.lim[2]), ...)
     base::plot(as.numeric(names(table(x$mixt.data))),
                as.numeric(table(x$mixt.data)) / sum(as.numeric(table(x$mixt.data))),
                type = "h", ...)
   }
-  on.exit(graphics::par(new = FALSE))
 }
 
 
@@ -172,22 +172,58 @@ print.twoComp_mixt <- function(x, ...)
   cat("\nCall:")
   print(x$call)
   cat("\n")
-  cat("Component distributions: ", unlist(x$comp.dist), "\n")
-  cat("Support of the component distributions: ", unlist(x$dist.type), "\n\n")
-  cat("Value of the component parameters: \n")
-  print(unlist(x$comp.param))
-  cat("\nMixing proportion:", x$mix.prop, "\n")
-  cat("\n")
-  cat("Number of observations: ", x$n, "\n")
+  cat("Number of observations:", x$n, "\n")
   cat("\n")
   if (any(x$comp.dist == "multinom")) {
     cat("Obtained multinomial mixture distribution: \n", table(x$mixt.data), "\n")
   } else {
-    cat("Simulated data (first 10 obs.): \n", utils::head(x$mixt.data, 10), "\n")
+    cat("Simulated data (first 5 obs.): \n", utils::head(x$mixt.data, 5))
     cat("\n")
-    cat("Simulated observations coming from the 1st component (first 10 obs.): \n", utils::head(x$comp1.data, 10), "\n")
+    cat("Simulated observations coming from the 1st component (first 5 obs.): \n", utils::head(x$comp1.data, 5))
     cat("\n")
-    cat("Simulated observations coming from the 2nd component (first 10 obs.): \n", utils::head(x$comp2.data, 10), "\n")
+    cat("Simulated observations coming from the 2nd component (first 5 obs.): \n", utils::head(x$comp2.data, 5))
+  }
+  cat("\n\n")
+}
+
+
+#' Summary method for objects 'twoComp_mixt'
+#'
+#' Provides statistical indicators of an object of class 'twoComp_mixt'.
+#' A two-component mixture model has probability density function (pdf) l such that:
+#'    l = p * f + (1-p) * g,
+#' where p is the mixing proportion, and f and g are the component distributions.
+#'
+#' @param object An object of class 'twoComp_mixt'.
+#' @param ... A list of additional parameters belonging to the default method.
+#'
+#' @author Xavier Milhaud <xavier.milhaud.research@gmail.com>
+#' @export
+
+summary.twoComp_mixt <- function(object, ...)
+{
+  cat("\nCall:")
+  print(object$call)
+  cat("\n")
+  cat("Component distributions: ", unlist(object$comp.dist), "\n")
+  cat("Support of the component distributions: ", unlist(object$dist.type), "\n\n")
+  cat("Value of the component parameters: \n")
+  print(unlist(object$comp.param))
+  cat("\nMixing proportion:", object$mix.prop, "\n")
+  cat("\n")
+  cat("Number of observations: ", object$n, "\n")
+  cat("\n")
+  if (any(object$comp.dist == "multinom")) {
+    cat("Obtained multinomial mixture distribution: \n", table(object$mixt.data), "\n")
+  } else {
+    cat("Statistics related to the simulated sample: \n")
+    print(summary(object$mixt.data))
+    cat("\n")
+    cat("Statistics related to the first component of the two-component mixture: \n")
+    print(summary(object$comp1.data))
+    cat("\n")
+    cat("Statistics related to the second component of the two-component mixture: \n")
+    print(summary(object$comp2.data))
   }
   cat("\n")
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/admix_model.R
 \name{admix_model}
 \alias{admix_model}
-\title{Create an object of class 'admix_model'}
+\title{Define the distribution/parameter(s) of the known component}
 \usage{
 admix_model(knownComp_dist, knownComp_param)
 }
@@ -19,13 +19,14 @@ involved in the two-component mixture model (the unknown and the known ones); 2)
 the corresponding parameters of those distributions.
 }
 \description{
-Create an admixture model, also known as (aka) a contamination model. Such a model is a two-component
-mixture model with one known component. Both the second component distribution and the mixing weight
-are unknown.
+Create an object of class 'admix_model', containing the information about the known component distribution in the admixture model.
+An admixture (aka contamination) model is a two-component mixture model with one known component.
+Both the second component distribution and the mixing weight are unknown.
 }
 \examples{
 admix_model(knownComp_dist = "norm", knownComp_param = list("mean"=0, "sd"=1))
 admix_model(knownComp_dist = "exp", knownComp_param = list("rate"=2))
+admix_model(knownComp_dist = "pois", knownComp_param = list("lambda"=5))
 admix_model(knownComp_dist = "multinom", knownComp_param = list("size"=1, "prob"=c(0.2,0.8,0.1)))
 
 }

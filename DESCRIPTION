@@ -1,6 +1,6 @@
 Package: admix
 Title: Package Admix for Admixture (aka Contamination) Models
-Version: 2.3.4
+Version: 2.4
 Authors@R: c(
     person("Xavier", "Milhaud", , "xavier.milhaud.research@gmail.com", role = c("aut", "cre")),
     person("Pierre", "Vandekerkhove", role = "ctb"),
@@ -42,11 +42,11 @@ RdMacros: Rdpack
 Config/testthat/edition: 3
 VignetteBuilder: knitr
 NeedsCompilation: yes
-Packaged: 2025-03-07 09:49:32 UTC; XM
+Packaged: 2025-05-22 08:16:25 UTC; XM
 Author: Xavier Milhaud [aut, cre],
   Pierre Vandekerkhove [ctb],
   Denys Pommeret [ctb],
   Yahia Salhi [ctb]
 Maintainer: Xavier Milhaud <xavier.milhaud.research@gmail.com>
 Repository: CRAN
-Date/Publication: 2025-03-07 10:00:02 UTC
+Date/Publication: 2025-05-23 14:12:01 UTC

@@ -30,6 +30,7 @@ l1 = p1*f1 + (1-p1)\emph{g1 and l2 = p2}f2 + (1-p2)*g2, where g1 and g2 are the 
 For further details about IBM approach, see 'Details' below.
 }
 \examples{
+\dontrun{
 ## Continuous support: simulate mixture data.
 mixt1 <- twoComp_mixt(n = 1500, weight = 0.5,
                       comp.dist = list("norm", "norm"),
@@ -69,11 +70,17 @@ admixMod2 <- admix_model(knownComp_dist = mixt2$comp.dist[[2]],
 ## Estimate the mixture weights of the two admixture models (provide only hat(theta)_n):
 estim_IBM(samples = list(data1,data2), admixMod = list(admixMod1,admixMod2),
           compute_var = TRUE)
+}
 
 }
 \references{
 \insertRef{MilhaudPommeretSalhiVandekerkhove2024a}{admix}
 }
+\seealso{
+\code{\link[=print.estim_IBM]{print.estim_IBM()}} for printing a short version of the results from this estimation method,
+and \code{\link[=summary.estim_IBM]{summary.estim_IBM()}} for more comprehensive results.
+}
 \author{
 Xavier Milhaud \href{mailto:xavier.milhaud.research@gmail.com}{xavier.milhaud.research@gmail.com}
 }
+\keyword{internal}

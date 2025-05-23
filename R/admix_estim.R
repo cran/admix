@@ -1,8 +1,7 @@
-#' Estimate the unknown parameters of the admixture model(s)
+#' Estimate the unknown weight in the admixture model
 #'
-#' Estimate the component weights, the location shift parameter (in case of a symmetric unknown component density),
-#' and the unknown component distribution using different estimation techniques. We remind that the i-th admixture
-#' model has probability density function (pdf) l_i such that:
+#' Estimate the unknown component weight (and location shift parameter in case of a symmetric unknown component density),
+#' using different estimation techniques. We remind that the i-th admixture model has probability density function (pdf) l_i such that:
 #'    l_i = p_i * f_i + (1-p_i) * g_i, where g_i is the known component density.
 #' The unknown quantities p_i and f_i then have to be estimated.
 #'
@@ -58,6 +57,9 @@
 
 admix_estim <- function(samples, admixMod, est_method = c("PS","BVdk","IBM"), ...)
 {
+  if (!all(sapply(X = admixMod, FUN = inherits, what = "admix_model")))
+    stop("Argument 'admixMod' is not correctly specified. See ?admix_model.")
+
   meth <- match.arg(est_method)
   supp <- detect_support_type(unlist(samples))
   if ((supp != "Continuous") & (meth != "IBM"))
@@ -73,46 +75,29 @@ admix_estim <- function(samples, admixMod, est_method = c("PS","BVdk","IBM"), ..
     for (k in 1:n_samples) {
       estimate[[k]] <- estim_BVdk(samples = samples[[k]], admixMod = admixMod[[k]], ...)
     }
-    estim_weight <- sapply(X = estimate, "[[", "estimated_mixing_weights")
-    estim_loc <- sapply(X = estimate, "[[", "estimated_locations")
   } else if (meth == "PS") {
     for (k in 1:n_samples) {
       estimate[[k]] <- estim_PS(samples = samples[[k]], admixMod = admixMod[[k]], ...)
     }
-    estim_weight <- sapply(X = estimate, "[[", "estimated_mixing_weights")
   } else if (meth == "IBM") {
     for (k in 2:n_samples) {
       estimate[[k]] <- estim_IBM(samples = list(samples[[1]], samples[[k]]),
                                  admixMod = list(admixMod[[1]], admixMod[[k]]), ...)
     }
-    estimate <- estimate[-sapply(X = estimate, FUN = is.null)]
-    estim_weight <- sapply(X = estimate, FUN = "[[", "estimated_mixing_weights")
-    equal_knownComps <- sapply(X = estimate, FUN = "[[", "equal.knownComp")
-    fixed_prop <- sapply(X = estimate, FUN = "[[", "p.X.fixed")
   } else stop("Please choose appropriately the arguments of the function.")
 
-  estimators <- list(
-    n_populations = n_samples,
-    admixture_models = admixMod,
-    population_sizes = n_obs,
-    estimation_method = switch(meth, "BVdk" = "Bordes and Vandekerkhove (BVdk)",
-                               "PS" = "Patra and Sen (PS)",
-                               "IBM" = "Inversion Best-Matching (IBM)"),
-    estimated_mixing_weights = estim_weight
-    )
-  if (meth == "BVdk") estimators$estimated_locations = estim_loc
-  if (meth == "IBM") {
-    estimators$equal_knownComp = equal_knownComps
-    estimators$fixed_prop = fixed_prop
-  }
-  class(estimators) <- "admix_estim"
-  estimators$call <- match.call()
+  estimators <- list(estim_objects = estimate)
+  specific_class <- switch(meth, "BVdk" = "estim_BVdk",
+                           "PS" = "estim_PS",
+                           "IBM" = "estim_IBM")
 
+  class(estimators) <- c("admix_estim", specific_class)
+  estimators$call <- match.call()
   return(estimators)
 }
 
 
-#' Print the estimated parameters from K admixture models
+#' Print method for object of class 'admix_estim'
 #'
 #' @param x An object of class 'admix_estim' (see ?admix_estim).
 #' @param ... further arguments passed to or from other methods.
@@ -122,54 +107,28 @@ admix_estim <- function(samples, admixMod, est_method = c("PS","BVdk","IBM"), ..
 
 print.admix_estim <- function(x, ...)
 {
-  cat("Call:\n")
+  cat("\n")
+  cat("Call:")
   print(x$call)
-  if (x$estimation_method != "Inversion Best-Matching (IBM)") {
-    cat("\n")
-    cat(paste("Estimated weight of the unknown distribution in Sample ", 1:x$n_populations,
-              ": ", round(x$estimated_mixing_weights,2), sep = ""), sep = "\n")
-  } else {
-    cat("\nPairwise estimation performed (IBM estimation method). \n")
-    cat("N.B.: estimated weights are reliable only if the unknown
-component distributions have previously been tested equal.
-See ?admix_test. \n\n")
-    for (k in 1:(x$n_populations-1)) {
-      cat("----- Pair 1 and ", k+1, " -----\n", sep = "")
-      if (!x$equal_knownComp[k]) {
-        if (inherits(x$estimated_mixing_weights, "matrix")) {
-          cat("Estimated weight of the unknown distribution in Sample 1: ",
-              round(x$estimated_mixing_weights[ ,k][1],2), "\n", sep = "")
-          cat("Estimated weight of the unknown distribution in Sample ", k+1, ": ",
-              round(x$estimated_mixing_weights[ ,k][2],2), sep = "")
-          cat("\n")
-        } else {
-          cat("Estimated weight of the unknown distribution in Sample 1: ",
-              round(x$estimated_mixing_weights[[k]][1],2), "\n", sep = "")
-          cat("Estimated weight of the unknown distribution in Sample ", k+1, ": ",
-              round(x$estimated_mixing_weights[[k]][2],2), sep = "")
-          cat("\n")
-        }
-      } else {
-        cat("Estimated weights of the unknown distributions in Sample 1 and ", k+1, ": ",
-            paste(c(x$fixed_prop[k],round(x$estimated_mixing_weights[[k]],2)), collapse=", ", sep = ""), sep="")
-        cat("\nFirst proportion was fixed because of equal known components.
-The estimated proportion for the 2nd sample makes sense through the ratio of
-the two proportions, which should roughly be similar than the true actual ratio.\n")
-        cat("\n")
-      }
+  n_samples <- length(x$estim_objects)
+  if (inherits(x, what = "estim_IBM")) {
+    cat("\nPairwise estimation performed (IBM estimation method).\n\n")
+    for (i in 2:n_samples) {
+      cat("------ Samples #1 with #", i, " ------", sep = "")
+      print(x$estim_objects[[i]], ...)
     }
-  }
-  #cat("\n")
-  if (x$estimation_method == "Bordes and Vandekerkhove (BVdk)") {
-    cat(paste("Estimated location of the unknown distribution in Sample ", 1:x$n_populations,
-              ": ", round(x$estimated_locations,2), sep = ""), sep = "\n")
+  } else {
+    cat("\n")
+    for (i in 1:n_samples) {
+      cat("------ Sample #", i, " ------", sep = "")
+      print(x$estim_objects[[i]], ...)
+    }
   }
 }
 
-
-#' Results of estimated parameters from K admixture models
+#' Summary method for object of class 'admix_estim'
 #'
-#' Summarize the estimated weight(s) of the unknown component(s) in the admixture model(s) under study.
+#' Summarize the estimated weight(s) of the unknown component(s), and admixture model(s) under study.
 #' Recall that an admixture model follows the cumulative distribution function (CDF) L, where
 #' L = p*F + (1-p)*G, with G a known CDF, and p and F unknown quantities.
 #'
@@ -181,68 +140,23 @@ the two proportions, which should roughly be similar than the true actual ratio.
 
 summary.admix_estim <- function(object, ...)
 {
-  cat("Call:\n")
-  print(object$call)
-  cat("\n------- About samples ------\n")
-  cat(paste("Size of sample ", 1:object$n_populations, ": ", object$population_sizes, sep = ""), sep = "\n")
-  cat("\n------ About contamination (admixture) models -----")
-  cat("\n")
-  if (object$n_populations == 1) {
-    cat("-> Distribution and parameters of the known component \n for the admixture model: ", sep="")
-    cat(object$admixture_models[[1]]$comp.dist$known, "\n")
-    print(unlist(object$admixture_models[[1]]$comp.param$known, use.names = TRUE))
+  n_samples <- length(object$estim_objects)
+  if (inherits(object, what = "estim_IBM")) {
+    cat("\nPairwise estimation performed (IBM estimation method).\n\n")
+    for (i in 2:n_samples) {
+      cat("------ Samples #1 with #", i, " ------\n", sep = "")
+      summary(object$estim_objects[[i]], ...)
+    }
   } else {
-    for (k in 1:object$n_populations) {
-      cat("-> Distribution and parameters of the known component \n for admixture model #", k, ": ", sep="")
-      cat(paste(sapply(object$admixture_models[[k]], "[[", "known")[1:2], collapse = " - "))
+    cat("\n")
+    for (i in 1:n_samples) {
+      cat("------ Sample #", i, " ------\n\n", sep = "")
+      summary(object$estim_objects[[i]], ...)
       cat("\n")
     }
   }
-  cat("\n------ About estimation -----")
-  cat("\nEstimation approach: ", object$estimation_method,  "\n", sep = "")
-  if (object$estimation_method != "Inversion Best-Matching (IBM)") {
-    #cat("\n")
-    cat(paste("Estimated weight of the unknown distribution in Sample ", 1:object$n_populations,
-              ": ", round(object$estimated_mixing_weights,2), sep = ""), sep = "\n")
-  } else {
-    cat("\nPairwise estimation performed (IBM estimation method). \n")
-    cat("N.B.: estimated weights are reliable only if the unknown
-component distributions have previously been tested equal.
-See ?admix_test. \n\n")
-    for (k in 1:(object$n_populations-1)) {
-      cat("--- Pair 1 and ", k+1, " ---\n", sep = "")
-      if (!object$equal_knownComp[k]) {
-        if (inherits(object$estimated_mixing_weights, "matrix")) {
-          cat("Estimated weight of the unknown distribution in Sample 1: ",
-              round(object$estimated_mixing_weights[ ,k][1],2), "\n", sep = "")
-          cat("Estimated weight of the unknown distribution in Sample ", k+1, ": ",
-              round(object$estimated_mixing_weights[ ,k][2],2), sep = "")
-          cat("\n")
-        } else {
-          cat("Estimated weight of the unknown distribution in Sample 1: ",
-              round(object$estimated_mixing_weights[[k]][1],2), "\n", sep = "")
-          cat("Estimated weight of the unknown distribution in Sample ", k+1, ": ",
-              round(object$estimated_mixing_weights[[k]][2],2), sep = "")
-          cat("\n")
-        }
-      } else {
-        cat("Estimated weights of the unknown distributions in Sample 1 and ", k+1, ": ",
-            paste(c(object$fixed_prop[k],round(object$estimated_mixing_weights[[k]],2)), collapse=", ", sep = ""), sep="")
-        cat("\nFirst proportion was fixed because of equal known components.
-The estimated proportion for the 2nd sample makes sense through the ratio of
-the two proportions, which should roughly be similar than the true actual ratio.\n")
-        cat("\n")
-      }
-    }
-  }
   cat("\n")
-  if (object$estimation_method == "Bordes and Vandekerkhove") {
-    cat("-> Location parameters (symmetric density assumption):\n")
-    cat(paste("Estimated location of the unknown distribution in Sample ", 1:object$n_populations,
-              ": ", round(object$estimated_locations,2), sep = ""), sep = "\n")
-  }
 }
-
 
 
 #' Extractor for object of class 'admix_estim'
@@ -257,7 +171,8 @@ the two proportions, which should roughly be similar than the true actual ratio.
 
 getmixingWeight <- function(x)
 {
-  if (!inherits(x, "admix_estim") & !inherits(x, "admix_test") )
+  if (!inherits(x, "admix_estim") & !inherits(x, "admix_test"))
     stop("This function must be used with objects of class 'admix_estim' or 'admix_test'")
-  x$estimated_mixing_weights
+  weights <- sapply(X = x$estim_objects, "[[", 'estimated_mixing_weights')
+  unlist(Filter(Negate(is.null), weights))
 }

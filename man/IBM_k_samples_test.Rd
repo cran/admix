@@ -18,11 +18,11 @@ IBM_k_samples_test(
 \arguments{
 \item{samples}{A list of the K samples to be studied, all following admixture distributions.}
 
-\item{admixMod}{A list of objects of class class \link[admix]{admix_model}, containing useful information about distributions and parameters.}
+\item{admixMod}{A list of objects of class \link[admix]{admix_model}, containing useful information about distributions and parameters.}
 
 \item{conf_level}{The confidence level of the K-sample test.}
 
-\item{sim_U}{(default to NULL) Random draws of the inner convergence part of the contrast as defined in the IBM approach (see 'Details' below).}
+\item{sim_U}{(default to NULL) Random draws of the inner convergence part of the contrast as defined in the IBM approach (see references below).}
 
 \item{tune_penalty}{(default to TRUE) A boolean that allows to choose between a classical penalty term or an optimized penalty (embedding
 some tuning parameters, automatically optimized). Optimized penalty is particularly useful for low or unbalanced sample sizes
@@ -36,7 +36,7 @@ in the 'icv' testing method using the IBM estimation approach.}
 \item{n_cpu}{(default to 2) Number of cores used when paralleling computations.}
 }
 \value{
-An object of class \link[admix]{admix_test}, containing 17 attributes: 1) the number of samples for the test; 2) the sizes of each sample;
+An object of class 'IBM_test', containing 17 attributes: 1) the number of samples for the test; 2) the sizes of each sample;
 3) the information about component distributions for each sample; 4) the reject decision of the test; 5) the confidence level
 of the test (1-alpha, where alpha refers to the first-type error); 6) the test p-value; 7) the 95th-percentile of the contrast
 tabulated distribution; 8) the test statistic value; 9) the selected rank (number of terms involved in the test statistic);
@@ -54,7 +54,7 @@ observed sample. Perform the following hypothesis test:
 H0 : f_1 = ... = f_K  against  H1 : f_i differs from f_j (i different from j, and i,j in 1,...,K).
 }
 \examples{
-\donttest{
+\dontrun{
 ####### Under the null hypothesis H0 (with K=3 populations):
 ## Simulate mixture data:
 mixt1 <- twoComp_mixt(n = 450, weight = 0.4,
@@ -93,3 +93,4 @@ IBM_k_samples_test(samples = list(data1, data2, data3),
 \author{
 Xavier Milhaud \href{mailto:xavier.milhaud.research@gmail.com}{xavier.milhaud.research@gmail.com}
 }
+\keyword{internal}

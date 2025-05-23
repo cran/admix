@@ -29,7 +29,11 @@
 #'         7) an object of the class 'dist.fun' (that gives the distance); 8) the tuning parameter 'c.n'; 9) the lower bound of the
 #'         estimated mixing proportion (if such an option has been chosen); 10) the number of observations.
 #'
+#' @seealso [print.estim_PS()] for printing a short version of the results from this estimation method,
+#'          and [summary.estim_PS()] for more comprehensive results.
+#'
 #' @examples
+#' \dontrun{
 #' ## Simulate mixture data:
 #' mixt1 <- twoComp_mixt(n = 800, weight = 0.33,
 #'                       comp.dist = list("gamma", "exp"),
@@ -41,15 +45,18 @@
 #'                          knownComp_param = mixt1$comp.param[[2]])
 #' ## Estimation step:
 #' estim_PS(samples = data1, admixMod = admixMod1, method = 'fixed')
-#'
+#' }
 #'
 #' @author Xavier Milhaud <xavier.milhaud.research@gmail.com>
-#' @export
+#' @keywords internal
 
 estim_PS <- function(samples, admixMod, method = c("fixed", "lwr.bnd", "cv"),
                      c.n =  0.1*log(log(length(samples))), folds = 10, reps = 1,
                      cn.s = NULL, cn.length = 100, gridsize = 1200)
 {
+  if (!inherits(x = admixMod, what = "admix_model"))
+    stop("Argument 'admixMod' is not correctly specified. See ?admix_model.")
+
 	if (!is.vector(samples)) stop("'samples' has to be a numerical vector.")
 	if (is.null(method)) stop("'method' cannot be NULL")
   n <- length(samples)
@@ -126,25 +133,28 @@ estim_PS <- function(samples, admixMod, method = c("fixed", "lwr.bnd", "cv"),
 #' @param ... further arguments passed to or from other methods.
 #'
 #' @author Xavier Milhaud <xavier.milhaud.research@gmail.com>
-#' @export
+#' @keywords internal
 
 print.estim_PS <- function(x, ...){
-  cat("Call:")
-  print(x$call)
+  #cat("\n")
+  #cat("Call:")
+  #print(x$call)
+  cat("\n")
   if(x$method != "lwr.bnd"){
-    cat("\n", paste("Estimate of the mixing weight (proportion of the unknown component distribution): " , round(x$estimated_mixing_weights,2)))
+    cat(paste("Estimated mixing weight (of the unknown component):" , round(x$estimated_mixing_weights,3)))
     #cat("\n", paste("The chosen value c_n is", round(x$c.n, 3)), "\n")
-    if( !is.null(x$cv.out)){
-      old_par <- graphics::par()$mfrow
-      graphics::par(mfrow=c(1,2))
-      plot(x$cv.out)
-      on.exit(graphics::par(old_par))
-    }
-    plot(x$dist.out)
+#    if( !is.null(x$cv.out)){
+#      old_par <- graphics::par()$mfrow
+#      on.exit(graphics::par(old_par))
+#      graphics::par(mfrow=c(1,2))
+#      plot(x$cv.out)
+#    }
+#    plot(x$dist.out)
   } else if(x$method == 'lwr.bnd'){
     plot(x$dist.out)
     print (paste("The  '95%' lower confidence for alp_0 is ", x$alp.Lwr))
   }
+  cat("\n\n")
 }
 
 
@@ -156,7 +166,7 @@ print.estim_PS <- function(x, ...){
 #' @param ... A list of additional parameters belonging to the default method.
 #'
 #' @author Xavier Milhaud <xavier.milhaud.research@gmail.com>
-#' @export
+#' @keywords internal
 
 summary.estim_PS <- function(object, ...)
 {
@@ -165,12 +175,13 @@ summary.estim_PS <- function(object, ...)
   cat("\n")
   cat("------- Sample -------\n")
   cat("Sample size: ", object$population_sizes, "\n")
-  cat("-> Distribution and parameters of the known component \n in the admixture model: ", sep="")
-  cat(object$admixture_models$comp.dist$known, "\n")
-  print(unlist(object$admixture_models$comp.param$known, use.names = TRUE))
+  cat("-> Distribution of the known component:", object$admixture_models$comp.dist$known, "\n", sep="")
+  cat("-> Parameter(s) of the known component:", paste(names(object$admixture_models$comp.param$known), object$admixture_models$comp.param$known, collapse="\t", sep="="), sep="")
+  cat("\n")
   cat("\n------- Estimation results -------\n")
-  cat(paste("Estimate of the mixing weight (proportion of the unknown component distribution) is" , object$estimated_mixing_weights))
-  cat("\n", paste(" The chosen value c_n is", object$c.n))
+  cat(paste("Estimate of the mixing weight (proportion of the unknown component distribution) is" , round(object$estimated_mixing_weights,3)))
+  cat("\n", paste(" The chosen value c_n is", round(object$c.n,3)))
+  cat("\n")
 }
 
 #plot.estim_PS <- function(x, ...){
@@ -310,6 +321,7 @@ print.estimCV_PS <- function(x,...)
   print(x$call)
   print(paste("Cross validated estimate of the mixing weight (proportion of the unknown component distribution) is" , x$alp.hat))
   print(paste(" The cross-validated choice of c_n is", x$cn.cv))
+  cat("\n")
 }
 
 
@@ -422,7 +434,6 @@ PS_dist_calc <- function(data, gridsize = 200)
   grid.pts <- {1:floor(gridsize)} / gridsize
 
   for (ii in 1:length(grid.pts)) {
-    # print(i)
     aa <- grid.pts[ii]
     F.hat <- (Fn.1 - (1-aa)*Fb) / aa                # computes the naive estimator of F_s
     F.is <- Iso::pava(F.hat, Freq, decreasing=FALSE)     # computes the Isotonic Estimator of F_s
@@ -476,6 +487,7 @@ print.PS_dist_fun <- function(x,...){
   t.mat <- cbind(x$grid.pts , x$distance)
   colnames(t.mat) <- c("gamma", "distance")
   print(t(t.mat))
+  cat("\n")
 }
 
 

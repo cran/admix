@@ -1,4 +1,4 @@
-#' Clustering of K populations following admixture models
+#' Cluster K populations following admixture models
 #'
 #' Create clusters on the unknown components related to the K populations following admixture models. Based on the K-sample test
 #' using Inversion - Best Matching (IBM) approach, see 'Details' below for further information.
@@ -71,7 +71,11 @@
 admix_cluster <- function(samples, admixMod, conf_level = 0.95, tune_penalty = TRUE,
                           tabul_dist = NULL, echo = TRUE, ...)
 {
+  if (!all(sapply(X = admixMod, FUN = inherits, what = "admix_model")))
+    stop("Argument 'admixMod' is not correctly specified. See ?admix_model.")
+
   old_options_warn <- base::options()$warn
+  on.exit(base::options(warn = old_options_warn))
   base::options(warn = -1)
 
   if (length(sapply(samples, length)) == 1) return("One single sample, no clusters to be found.")
@@ -96,7 +100,7 @@ admix_cluster <- function(samples, admixMod, conf_level = 0.95, tune_penalty = T
       XY <- estim_IBM(samples = samples[as.numeric(couples.list[k, ])],
                       admixMod = admixMod[as.numeric(couples.list[k, ])], n.integ = 1000)
     }
-    weights.list[k, ] <- getmixingWeight(XY)
+    weights.list[k, ] <- XY$estimated_mixing_weights
     empirical.contr[[k]] <- minimal_size * IBM_empirical_contrast(XY$estimated_mixing_weights, samples = samples[as.numeric(couples.list[k, ])],
                                                                   admixMod = admixMod[as.numeric(couples.list[k, ])], G = XY$integ.supp, fixed.p.X = XY$p.X.fixed)
   }
@@ -243,8 +247,6 @@ admix_cluster <- function(samples, admixMod, conf_level = 0.95, tune_penalty = T
   )
   class(obj) <- "admix_cluster"
   obj$call <- match.call()
-
-  on.exit(base::options(warn = old_options_warn))
   return(obj)
 }
 
@@ -264,9 +266,10 @@ print.admix_cluster <- function(x, ...)
 {
   cat("Call:\n")
   print(x$call)
-  cat("\nNumber of detected clusters across the samples provided: ", x$n_clust, ".\n", sep = "")
-  cat("\nList of samples involved in each built cluster (inside c()) :\n",
-      paste("  - Cluster #", 1:length(x$clust_pop), ": samples ", x$clust_pop, collapse="\n", sep = ""), sep="")
+  cat("\nNumber of detected clusters: ", x$n_clust, ".\n", sep = "")
+  cat("List of samples involved in each built cluster:\n",
+      gsub("\\)", "", gsub("c\\(", "", paste("  - Cluster #", 1:length(x$clust_pop), ": samples ",
+                                             x$clust_pop, collapse="\n", sep = ""))))
   cat("\n")
 }
 
@@ -301,8 +304,9 @@ summary.admix_cluster <- function(object, ...)
   cat("\nNumber of detected clusters across the samples provided: ", object$n_clust, ".", sep = "")
   cat("\np-values of the k-sample tests (showing when to close the clusters (i.e. p-value < ", (1-object$confidence_level), ") equal: ",
       paste(object$pval_clust, collapse=", "), ".", sep="")
-  cat("\n\nList of samples involved in each built cluster (inside c()) :\n",
-      paste("  - Cluster #", 1:length(object$clust_pop), ": samples ", object$clust_pop, collapse="\n", sep = ""), sep="")
+  cat("\n\nList of samples involved in each built cluster:\n",
+      gsub("\\)", "", gsub("c\\(", "", paste("  - Cluster #", 1:length(object$clust_pop), ": samples ",
+                                             object$clust_pop, collapse="\n", sep = ""))))
   weights.list <- vector(mode = "list", length = length(object$clust_weights))
   for (i in 1:length(object$clust_weights)) {
     if (object$clust_sizes[i] > 2) {
@@ -314,7 +318,8 @@ summary.admix_cluster <- function(object, ...)
   }
   cat("\n\nList of estimated weights for the unknown distributions in each detected cluster
       (in the same order as listed samples in each detected clusters) :\n",
-      paste("  - Estimated weights of the unknown distributions for cluster ", 1:length(object$clust_pop), ": ", weights.list, collapse="\n"), sep="")
+      gsub("\\)", "", gsub("c\\(", "", paste("- Estimated weights of the unknown distributions for cluster ",
+                                             1:length(object$clust_pop), ": ", weights.list, collapse="\n", sep=""))))
   cat("\n\nMatrix of discrepancies between samples (used for clustering):\n")
   print(object$discrepancy_matrix)
 }
