@@ -39,7 +39,7 @@ admix_model <- function(knownComp_dist, knownComp_param)
     stopifnot("Name of parameters not appropriate" = all(names(knownComp_param) == c("shape","rate")))
   } else {
     if (!all(as.character(dist_table[rownames(dist_table) == knownComp_dist, 4:(4+nparam_theo-1)]) == names(knownComp_param))) {
-      cat("Name of parameters not appropriate, please provide the following parameters /",
+      cat("Name of parameters not appropriate (see Distribution.df in package 'EnvStats'), please provide the following parameters :",
           as.character(dist_table[rownames(dist_table) == knownComp_dist, 4:(4+nparam_theo-1)]), sep = " / ")
       cat("\n")
       stop()
@@ -81,7 +81,6 @@ print.admix_model <- function(x, ...)
 }
 
 
-
 #' Plot method for objects of class 'admix_model'
 #'
 #' Plots the probability density function of the known component of the admixture model, where
@@ -91,6 +90,10 @@ print.admix_model <- function(x, ...)
 #'
 #' @param x An object of class 'admix_model'.
 #' @param ... A list of additional parameters belonging to the default method.
+#'
+#' @examples
+#' plot(admix_model(knownComp_dist = "norm", knownComp_param = list("mean"=0, "sd"=1)))
+#' plot(admix_model(knownComp_dist = "pois", knownComp_param = list("lambda"=1.5)))
 #'
 #' @author Xavier Milhaud <xavier.milhaud.research@gmail.com>
 #' @export
@@ -106,16 +109,18 @@ plot.admix_model <- function(x, ...)
     x_range <- c(min(sim_values), max(sim_values))
     supp <- detect_support_type(sample1 = sim_values)
     if (supp == "Continuous") {
-      txt <- paste("d", x$comp.dist$known, "(x=seq(from=",x_range[1], ", to=", x_range[2], ", length.out=1000),",
+      txt <- paste("d", x$comp.dist$known, "(x=seq(from=",round(x_range[1],2), ", to=",
+                   round(x_range[2],2), ", length.out=1000), ",
                    paste(names(x$comp.param$known), "=", x$comp.param$known, collapse=", ", sep=""), ")",
                    sep = "", collapse = "")
       plot(x = seq(from = x_range[1], to = x_range[2], length.out = 1000),
-           y = eval(parse(text = txt)), ...)
+           y = eval(parse(text = txt)), xlab = "Support", ylab = "probability density function", ...)
     } else {  # the discrete case
       txt <- paste("d", x$comp.dist$known, "(x=seq(from=",x_range[1], ", to=", x_range[2], ", by=1),",
                    paste(names(x$comp.param$known), "=", x$comp.param$known, collapse=", ", sep=""), ")",
                    sep = "", collapse = "")
-      plot(x = seq(from = x_range[1], to = x_range[2], by = 1), y = eval(parse(text = txt)), ...)
+      plot(x = seq(from = x_range[1], to = x_range[2], by = 1), y = eval(parse(text = txt)),
+           xlab = "Support", ylab = "Histogram", ...)
     }
 
   } else {  # case of multinomial distribution

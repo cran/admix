@@ -435,11 +435,11 @@ Exponential-Exponential and Gamma-Gamma mixtures.</p>
 <span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a>                      <span class="at">comp.dist =</span> <span class="fu">list</span>(<span class="st">&quot;gamma&quot;</span>, <span class="st">&quot;exp&quot;</span>),</span>
 <span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a>                      <span class="at">comp.param =</span> <span class="fu">list</span>(<span class="fu">list</span>(<span class="st">&quot;shape&quot;</span> <span class="ot">=</span> <span class="dv">14</span>, <span class="st">&quot;scale&quot;</span> <span class="ot">=</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">2</span>),</span>
 <span id="cb4-21"><a href="#cb4-21" tabindex="-1"></a>                                        <span class="fu">list</span>(<span class="st">&quot;rate&quot;</span> <span class="ot">=</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">6</span>)))</span>
-<span id="cb4-22"><a href="#cb4-22" tabindex="-1"></a>data1 <span class="ot">&lt;-</span> <span class="fu">getmixtData</span>(mixt1)</span>
-<span id="cb4-23"><a href="#cb4-23" tabindex="-1"></a>data2 <span class="ot">&lt;-</span> <span class="fu">getmixtData</span>(mixt2)</span>
-<span id="cb4-24"><a href="#cb4-24" tabindex="-1"></a>data3 <span class="ot">&lt;-</span> <span class="fu">getmixtData</span>(mixt3)</span>
-<span id="cb4-25"><a href="#cb4-25" tabindex="-1"></a>data4 <span class="ot">&lt;-</span> <span class="fu">getmixtData</span>(mixt4)</span>
-<span id="cb4-26"><a href="#cb4-26" tabindex="-1"></a>data5 <span class="ot">&lt;-</span> <span class="fu">getmixtData</span>(mixt5)</span>
+<span id="cb4-22"><a href="#cb4-22" tabindex="-1"></a>data1 <span class="ot">&lt;-</span> <span class="fu">get_mixture_data</span>(mixt1)</span>
+<span id="cb4-23"><a href="#cb4-23" tabindex="-1"></a>data2 <span class="ot">&lt;-</span> <span class="fu">get_mixture_data</span>(mixt2)</span>
+<span id="cb4-24"><a href="#cb4-24" tabindex="-1"></a>data3 <span class="ot">&lt;-</span> <span class="fu">get_mixture_data</span>(mixt3)</span>
+<span id="cb4-25"><a href="#cb4-25" tabindex="-1"></a>data4 <span class="ot">&lt;-</span> <span class="fu">get_mixture_data</span>(mixt4)</span>
+<span id="cb4-26"><a href="#cb4-26" tabindex="-1"></a>data5 <span class="ot">&lt;-</span> <span class="fu">get_mixture_data</span>(mixt5)</span>
 <span id="cb4-27"><a href="#cb4-27" tabindex="-1"></a>admixMod1 <span class="ot">&lt;-</span> <span class="fu">admix_model</span>(<span class="at">knownComp_dist =</span> mixt1<span class="sc">$</span>comp.dist[[<span class="dv">2</span>]],</span>
 <span id="cb4-28"><a href="#cb4-28" tabindex="-1"></a>                         <span class="at">knownComp_param =</span> mixt1<span class="sc">$</span>comp.param[[<span class="dv">2</span>]])</span>
 <span id="cb4-29"><a href="#cb4-29" tabindex="-1"></a>admixMod2 <span class="ot">&lt;-</span> <span class="fu">admix_model</span>(<span class="at">knownComp_dist =</span> mixt2<span class="sc">$</span>comp.dist[[<span class="dv">2</span>]],</span>

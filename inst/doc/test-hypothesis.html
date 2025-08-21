@@ -423,7 +423,7 @@ an example of hypothesis testing in this 1-sample case:</p>
 <span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>                      <span class="at">comp.dist =</span> <span class="fu">list</span>(<span class="st">&quot;norm&quot;</span>, <span class="st">&quot;norm&quot;</span>),</span>
 <span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>                      <span class="at">comp.param =</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">&quot;mean&quot;</span> <span class="ot">=</span> <span class="dv">2</span>, <span class="st">&quot;sd&quot;</span> <span class="ot">=</span> <span class="fl">0.5</span>),</span>
 <span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>                                        <span class="fu">c</span>(<span class="st">&quot;mean&quot;</span> <span class="ot">=</span> <span class="dv">0</span>, <span class="st">&quot;sd&quot;</span> <span class="ot">=</span> <span class="dv">1</span>)))</span>
-<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>data1 <span class="ot">&lt;-</span> <span class="fu">getmixtData</span>(mixt1)</span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>data1 <span class="ot">&lt;-</span> <span class="fu">get_mixture_data</span>(mixt1)</span>
 <span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="do">## Define the admixture model:</span></span>
 <span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>admixMod <span class="ot">&lt;-</span> <span class="fu">admix_model</span>(<span class="at">knownComp_dist =</span> mixt1<span class="sc">$</span>comp.dist[[<span class="dv">2</span>]],</span>
 <span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>                        <span class="at">knownComp_param =</span> mixt1<span class="sc">$</span>comp.param[[<span class="dv">2</span>]])</span>
@@ -472,8 +472,8 @@ whether the test provides satisfactory results.</p>
 <span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>                      <span class="at">comp.dist =</span> <span class="fu">list</span>(<span class="st">&quot;norm&quot;</span>, <span class="st">&quot;norm&quot;</span>),</span>
 <span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a>                      <span class="at">comp.param =</span> <span class="fu">list</span>(<span class="fu">list</span>(<span class="st">&quot;mean&quot;</span> <span class="ot">=</span> <span class="dv">3</span>, <span class="st">&quot;sd&quot;</span> <span class="ot">=</span> <span class="fl">0.5</span>),</span>
 <span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>                                        <span class="fu">list</span>(<span class="st">&quot;mean&quot;</span> <span class="ot">=</span> <span class="dv">0</span>, <span class="st">&quot;sd&quot;</span> <span class="ot">=</span> <span class="dv">1</span>)))</span>
-<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a>data1 <span class="ot">&lt;-</span> <span class="fu">getmixtData</span>(mixt1)</span>
-<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a>data2 <span class="ot">&lt;-</span> <span class="fu">getmixtData</span>(mixt2)</span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a>data1 <span class="ot">&lt;-</span> <span class="fu">get_mixture_data</span>(mixt1)</span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a>data2 <span class="ot">&lt;-</span> <span class="fu">get_mixture_data</span>(mixt2)</span>
 <span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a><span class="do">## Define the admixture models:</span></span>
 <span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a>admixMod1 <span class="ot">&lt;-</span> <span class="fu">admix_model</span>(<span class="at">knownComp_dist =</span> mixt1<span class="sc">$</span>comp.dist[[<span class="dv">2</span>]],</span>
 <span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a>                         <span class="at">knownComp_param =</span> mixt1<span class="sc">$</span>comp.param[[<span class="dv">2</span>]])</span>
@@ -593,9 +593,9 @@ us study the case where we are under the null hypothesis <span class="math inlin
 <span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a>                      <span class="at">comp.dist =</span> <span class="fu">list</span>(<span class="st">&quot;norm&quot;</span>, <span class="st">&quot;norm&quot;</span>),</span>
 <span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a>                      <span class="at">comp.param =</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">&quot;mean&quot;</span> <span class="ot">=</span> <span class="sc">-</span><span class="dv">2</span>, <span class="st">&quot;sd&quot;</span> <span class="ot">=</span> <span class="fl">0.5</span>),</span>
 <span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a>                                        <span class="fu">c</span>(<span class="st">&quot;mean&quot;</span> <span class="ot">=</span> <span class="dv">2</span>, <span class="st">&quot;sd&quot;</span> <span class="ot">=</span> <span class="dv">1</span>)))</span>
-<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a>data1 <span class="ot">&lt;-</span> <span class="fu">getmixtData</span>(mixt1)</span>
-<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a>data2 <span class="ot">&lt;-</span> <span class="fu">getmixtData</span>(mixt2)</span>
-<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a>data3 <span class="ot">&lt;-</span> <span class="fu">getmixtData</span>(mixt3)</span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a>data1 <span class="ot">&lt;-</span> <span class="fu">get_mixture_data</span>(mixt1)</span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a>data2 <span class="ot">&lt;-</span> <span class="fu">get_mixture_data</span>(mixt2)</span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a>data3 <span class="ot">&lt;-</span> <span class="fu">get_mixture_data</span>(mixt3)</span>
 <span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a>admixMod1 <span class="ot">&lt;-</span> <span class="fu">admix_model</span>(<span class="at">knownComp_dist =</span> mixt1<span class="sc">$</span>comp.dist[[<span class="dv">2</span>]],</span>
 <span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a>                         <span class="at">knownComp_param =</span> mixt1<span class="sc">$</span>comp.param[[<span class="dv">2</span>]])</span>
 <span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a>admixMod2 <span class="ot">&lt;-</span> <span class="fu">admix_model</span>(<span class="at">knownComp_dist =</span> mixt2<span class="sc">$</span>comp.dist[[<span class="dv">2</span>]],</span>

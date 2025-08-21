@@ -21,7 +21,7 @@
 #'                       comp.dist = list("norm", "norm"),
 #'                       comp.param = list(list("mean" = -2, "sd" = 0.5),
 #'                                         list("mean" = 0, "sd" = 1)))
-#' data1 <- getmixtData(mixt1)
+#' data1 <- get_mixture_data(mixt1)
 #' ## Define the admixture models:
 #' admixMod1 <- admix_model(knownComp_dist = mixt1$comp.dist[[2]],
 #'                          knownComp_param = mixt1$comp.param[[2]])
@@ -41,8 +41,8 @@
 #'                       comp.dist = list("pois", "pois"),
 #'                       comp.param = list(list("lambda" = 3),
 #'                                         list("lambda" = 4)))
-#' data1 <- getmixtData(mixt1)
-#' data2 <- getmixtData(mixt2)
+#' data1 <- get_mixture_data(mixt1)
+#' data2 <- get_mixture_data(mixt2)
 #' ## Define the admixture models:
 #' admixMod1 <- admix_model(knownComp_dist = mixt1$comp.dist[[2]],
 #'                          knownComp_param = mixt1$comp.param[[2]])
@@ -64,8 +64,8 @@
 #'                       comp.dist = list("multinom", "multinom"),
 #'                       comp.param = list(list("size" = 1, "prob" = c(0.3,0.4,0.3)),
 #'                                         list("size" = 1, "prob" = c(0.2,0.6,0.2))))
-#' data1 <- getmixtData(mixt1)
-#' data2 <- getmixtData(mixt2)
+#' data1 <- get_mixture_data(mixt1)
+#' data2 <- get_mixture_data(mixt2)
 #' ## Define the admixture models:
 #' admixMod1 <- admix_model(knownComp_dist = mixt1$comp.dist[[2]],
 #'                          knownComp_param = mixt1$comp.param[[2]])
@@ -206,8 +206,8 @@ summary.decontaminated_density <- function(object, ...)
 #'                       comp.dist = list("norm", "norm"),
 #'                       comp.param = list(list("mean" = 3, "sd" = 0.5),
 #'                                         list("mean" = 5, "sd" = 2)))
-#' data1 <- getmixtData(mixt1)
-#' data2 <- getmixtData(mixt2)
+#' data1 <- get_mixture_data(mixt1)
+#' data2 <- get_mixture_data(mixt2)
 #' ## Define the admixture models:
 #' admixMod1 <- admix_model(knownComp_dist = mixt1$comp.dist[[2]],
 #'                          knownComp_param = mixt1$comp.param[[2]])
@@ -216,7 +216,7 @@ summary.decontaminated_density <- function(object, ...)
 #' ## Estimation:
 #' est <- admix_estim(samples = list(data1,data2),
 #'                    admixMod = list(admixMod1,admixMod2), est_method = 'PS')
-#' prop <- getmixingWeight(est)
+#' prop <- get_mixing_weights(est)
 #' ## Determine the decontaminated version of the unknown density by inversion:
 #' res1 <- decontaminated_density(sample1 = data1, estim.p = prop[1],
 #'                                admixMod = admixMod1)
@@ -235,8 +235,8 @@ summary.decontaminated_density <- function(object, ...)
 #'                       comp.dist = list("pois", "pois"),
 #'                       comp.param = list(list("lambda" = 3),
 #'                                         list("lambda" = 4)))
-#' data1 <- getmixtData(mixt1)
-#' data2 <- getmixtData(mixt2)
+#' data1 <- get_mixture_data(mixt1)
+#' data2 <- get_mixture_data(mixt2)
 #' ## Define the admixture models:
 #' admixMod1 <- admix_model(knownComp_dist = mixt1$comp.dist[[2]],
 #'                          knownComp_param = mixt1$comp.param[[2]])
@@ -245,7 +245,7 @@ summary.decontaminated_density <- function(object, ...)
 #' ## Estimation:
 #' est <- admix_estim(samples = list(data1,data2),
 #'                    admixMod = list(admixMod1,admixMod2), est_method = "IBM")
-#' prop <- getmixingWeight(est)
+#' prop <- get_mixing_weights(est)
 #' ## Determine the decontaminated version of the unknown density by inversion:
 #' res1 <- decontaminated_density(sample1 = data1, estim.p = prop[1],
 #'                                admixMod = admixMod1)
@@ -264,8 +264,8 @@ summary.decontaminated_density <- function(object, ...)
 #'                       comp.dist = list("multinom", "multinom"),
 #'                       comp.param = list(list("size" = 1, "prob" = c(0.3,0.4,0.3)),
 #'                                         list("size" = 1, "prob" = c(0.2,0.6,0.2))))
-#' data1 <- getmixtData(mixt1)
-#' data2 <- getmixtData(mixt2)
+#' data1 <- get_mixture_data(mixt1)
+#' data2 <- get_mixture_data(mixt2)
 #' ## Define the admixture models:
 #' admixMod1 <- admix_model(knownComp_dist = mixt1$comp.dist[[2]],
 #'                          knownComp_param = mixt1$comp.param[[2]])
@@ -274,7 +274,7 @@ summary.decontaminated_density <- function(object, ...)
 #' ## Estimation:
 #' est <- admix_estim(samples = list(data1,data2),
 #'                    admixMod = list(admixMod1,admixMod2), est_method = "IBM")
-#' prop <- getmixingWeight(est)
+#' prop <- get_mixing_weights(est)
 #' ## Determine the decontaminated version of the unknown density by inversion:
 #' res1 <- decontaminated_density(sample1 = data1, estim.p = prop[1],
 #'                                admixMod = admixMod1)
@@ -339,8 +339,8 @@ plot.decontaminated_density <- function(x, x_val, add_plot = FALSE, ...)
 #'                       comp.dist = list("norm", "norm"),
 #'                       comp.param = list(list("mean" = 3, "sd" = 0.5),
 #'                                         list("mean" = 5, "sd" = 2)))
-#' data1 <- getmixtData(mixt1)
-#' data2 <- getmixtData(mixt2)
+#' data1 <- get_mixture_data(mixt1)
+#' data2 <- get_mixture_data(mixt2)
 #' ## Define the admixture models:
 #' admixMod1 <- admix_model(knownComp_dist = mixt1$comp.dist[[2]],
 #'                          knownComp_param = mixt1$comp.param[[2]])
@@ -349,7 +349,7 @@ plot.decontaminated_density <- function(x, x_val, add_plot = FALSE, ...)
 #' ## Estimation:
 #' est <- admix_estim(samples = list(data1,data2),
 #'                    admixMod = list(admixMod1,admixMod2), est_method = 'PS')
-#' prop <- getmixingWeight(est)
+#' prop <- get_mixing_weights(est)
 #' ## Determine the decontaminated version of the unknown CDF by inversion:
 #' F1 <- decontaminated_cdf(sample1 = data1, estim.p = prop[1], admixMod = admixMod1)
 #' F2 <- decontaminated_cdf(sample1 = data2, estim.p = prop[2], admixMod = admixMod2)
@@ -359,8 +359,8 @@ plot.decontaminated_density <- function(x, x_val, add_plot = FALSE, ...)
 #' plot(x=abs, y=F2(abs), xlim=c(-1,4), ylim=c(0,1), type="l", col="red")
 #'
 #' @author Xavier Milhaud <xavier.milhaud.research@gmail.com>
-#' @export
 #' @keywords internal
+#' @export
 
 decontaminated_cdf <- function(sample1, estim.p, admixMod)
 {
