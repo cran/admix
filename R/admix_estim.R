@@ -40,18 +40,31 @@
 #'                       comp.dist = list("norm", "exp"),
 #'                       comp.param = list(list("mean" = -2, "sd" = 0.5),
 #'                                         list("rate" = 1)))
+#' mixt3 <- twoComp_mixt(n = 500, weight = 0.5,
+#'                       comp.dist = list("pois", "pois"),
+#'                       comp.param = list(list("lambda" = 2),
+#'                                         list("lambda" = 7)))
+#' mixt4 <- twoComp_mixt(n = 1500, weight = 0.2, comp.dist = list("multinom", "multinom"),
+#'                       comp.param = list(list("size"=1, "prob" = c(0.8,0.1,0.1)),
+#'                                    list("size"=1, "prob" = c(0.1,0.2,0.7))))
 #' data1 <- get_mixture_data(mixt1)
 #' data2 <- get_mixture_data(mixt2)
+#' data3 <- get_mixture_data(mixt3)
+#' data4 <- get_mixture_data(mixt4)
 #' ## Define the admixture models:
 #' admixMod1 <- admix_model(knownComp_dist = mixt1$comp.dist[[2]],
 #'                          knownComp_param = mixt1$comp.param[[2]])
 #' admixMod2 <- admix_model(knownComp_dist = mixt2$comp.dist[[2]],
 #'                          knownComp_param = mixt2$comp.param[[2]])
+#' admixMod3 <- admix_model(knownComp_dist = mixt3$comp.dist[[2]],
+#'                          knownComp_param = mixt3$comp.param[[2]])
+#' admixMod4 <- admix_model(knownComp_dist = mixt4$comp.dist[[2]],
+#'                          knownComp_param = mixt4$comp.param[[2]])
 #' # Estimation by different methods:
-#' admix_estim(samples=list(data1), admixMod=list(admixMod1), est_method = "BVdk")
-#' admix_estim(samples=list(data1), admixMod=list(admixMod1), est_method = "PS")
-#' admix_estim(samples=list(data1,data2), admixMod=list(admixMod1,admixMod2), est_method = "PS")
-#' admix_estim(samples=list(data1,data2), admixMod=list(admixMod1,admixMod2), est_method = "IBM")
+#' admix_estim(samples = list(data1), admixMod = list(admixMod1), est_method = "BVdk")
+#' admix_estim(samples = list(data1, data2, data3, data4),
+#'             admixMod = list(admixMod1, admixMod2, admixMod3, admixMod4), est_method = "PS")
+#' admix_estim(samples = list(data1,data2), admixMod = list(admixMod1,admixMod2), est_method = "IBM")
 #'
 #' @author Xavier Milhaud <xavier.milhaud.research@gmail.com>
 #' @export
@@ -59,7 +72,7 @@
 admix_estim <- function(samples, admixMod, est_method = c("PS","BVdk","IBM"), ...)
 {
   if (!is.list(samples))
-    stop("Please provide sample(s) and admixture model(s) in lists, also with only one sample!")
+    stop("Please provide sample(s) and admixture model(s) in a list, also with only one sample!")
   if (!all(sapply(X = admixMod, FUN = inherits, what = "admix_model")))
     stop("Argument 'admixMod' is not correctly specified. See ?admix_model.")
 
@@ -93,7 +106,6 @@ admix_estim <- function(samples, admixMod, est_method = c("PS","BVdk","IBM"), ..
   specific_class <- switch(meth, "BVdk" = "estim_BVdk",
                            "PS" = "estim_PS",
                            "IBM" = "estim_IBM")
-
   class(estimators) <- c(specific_class, "admix_estim")
   estimators$call <- match.call()
 
